@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+{% block title %}Daily Essentials - MedInfo AI{% endblock %}
+
+{% block content %}
+<section id="essentials" class="section full-width-container" style="padding: 2rem 3rem; margin: 0; display: flex; flex-direction: column; height: 100%;">
+    <h2 style="text-align: center; margin-bottom: 2rem;">Daily Health Essentials</h2>
+    
+    <div id="essentials-container" class="essentials-grid" style="flex-grow: 1; overflow-y: auto;">
+        <!-- Products will be listed here -->
+    </div>
+</section>
+
+<style>
+.essentials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+.product-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+    padding: 1.5rem;
+    text-align: center;
+}
+.product-card img {
+    max-width: 100%;
+    height: 150px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+}
+.product-card h3 {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+.product-card .price {
+    font-size: 1.1rem;
+    color: #3498db;
+    font-weight: 600;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const essentials = [
+        { name: 'Vitamin C Tablets', price: '₹150', image: 'static/img/vitaminc.jpg' },
+        { name: 'Digital Thermometer', price: '₹350', image: 'static/img/thermometer.jpg' },
+        { name: 'Hand Sanitizer (500ml)', price: '₹250', image: 'static/img/handsanitizer.jpg' },
+        { name: 'Multivitamin Gummies', price: '₹450', image: 'static/img/multivitamin.jpg' },
+        { name: 'First Aid Kit', price: '₹500', image: 'static/img/firstaidkit.jpg' },
+        { name: 'Protein Powder (1kg)', price: '₹1200', image: 'static/img/proteinpowder.jpg' }
+    ];
+
+    const container = document.getElementById('essentials-container');
+    let html = '';
+
+    essentials.forEach(product => {
+        html += `
+            <div class="product-card">
+                <img src="${product.image}" alt="${product.name}">
+                <h3>${product.name}</h3>
+                <p class="price">${product.price}</p>
+                <button class="save-item-btn" data-name="${product.name}" data-price="${product.price}" data-type="Essential">Save</button>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+
+    container.addEventListener('click', (event) => {
+        if (event.target.classList.contains('save-item-btn')) {
+            const item = {
+                name: event.target.dataset.name,
+                price: event.target.dataset.price,
+                type: event.target.dataset.type
+            };
+            saveItem(item);
+            alert('Item saved!');
+        }
+    });
+
+    function saveItem(item) {
+        let savedItems = JSON.parse(localStorage.getItem('savedItems')) || [];
+        savedItems.push(item);
+        localStorage.setItem('savedItems', JSON.stringify(savedItems));
+    }
+});
+</script>
+{% endblock %} 

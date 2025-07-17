@@ -1,0 +1,215 @@
+{% extends "layout.html" %}
+{% block title %}About MedInfo AI{% endblock %}
+
+{% block content %}
+<style>
+    .about-header {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: linear-gradient(135deg, rgba(74, 144, 226, 0.85), rgba(155, 89, 182, 0.85)), url("https://images.unsplash.com/photo-1576091160550-2173dba9996a?q=80&w=2070&auto=format&fit=crop");
+        background-size: cover;
+        background-position: center;
+        color: white;
+        border-radius: 16px;
+        margin: 2rem auto;
+        max-width: 1200px;
+    }
+    .about-header h1 {
+        font-size: 4rem;
+        font-weight: 900;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    }
+    .about-header p {
+        font-size: 1.35rem;
+        max-width: 800px;
+        margin: 0 auto;
+        opacity: 0.95;
+    }
+    .about-section {
+        max-width: 1100px;
+        margin: 5rem auto;
+        padding: 0 2rem;
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
+    .about-section.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .about-section h2 {
+        text-align: center;
+        font-size: 3rem;
+        color: #2c3e50;
+        margin-bottom: 3.5rem;
+        position: relative;
+        font-weight: 800;
+    }
+    .about-section h2::after {
+        content: '';
+        display: block;
+        width: 100px;
+        height: 5px;
+        background-color: #3498db;
+        margin: 0.75rem auto 0;
+        border-radius: 2px;
+    }
+    .about-section p, .about-section li {
+        color: #34495e;
+        line-height: 1.9;
+        font-size: 1.15rem;
+    }
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2.5rem;
+        text-align: center;
+    }
+    .grid-item {
+        background-color: #ffffff;
+        padding: 2.5rem;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .grid-item:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 50px rgba(0,0,0,0.12);
+    }
+    .grid-item .icon {
+        font-size: 3.5rem;
+        color: #3498db;
+        margin-bottom: 1.5rem;
+    }
+    .grid-item h3 {
+        font-size: 1.75rem;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+</style>
+
+<div class="about-header">
+    <h1>The Future of Health is in Your Hands.</h1>
+    <p>We're on a mission to decode complex medical science, transforming it into your ultimate personal health co-pilot. This isn't just information; it's intelligence, delivered instantly.</p>
+</div>
+
+<div class="about-section">
+    <h2>The Genesis of a Revolution</h2>
+    <p>MedInfo AI was born from a rebellion against medical confusion. We saw a world drowning in data but starved for clarity. This platform is our answer: an intelligent, intuitive, and indispensable health ally built to bring world-class medical insight directly to your fingertips.</p>
+</div>
+
+<div class="about-section">
+    <h2>Our Core Philosophy</h2>
+    <div class="grid-container">
+        <div class="grid-item">
+            <div class="icon">💡</div>
+            <h3>Radical Empowerment</h3>
+            <p>We don't just give you information; we give you command. By decoding complex medical jargon into crystal-clear language, we empower you to take decisive control of your health narrative.</p>
+        </div>
+        <div class="grid-item">
+            <div class="icon">🚀</div>
+            <h3>Pioneering Innovation</h3>
+            <p>We live at the bleeding edge of technology. By fusing elite AI with seamless user experience, we deliver tools so powerful they feel like magic, yet so simple anyone can master them.</p>
+        </div>
+        <div class="grid-item">
+            <div class="icon">❤️</div>
+            <h3>Unwavering Trust</h3>
+            <p>Trust is our bedrock. In an age of digital noise, we are your source of truth. Every piece of data is rigorously vetted and verified, ensuring your health journey is built on a foundation of absolute confidence.</p>
+        </div>
+    </div>
+</div>
+
+<div class="about-section">
+    <h2>A Tool for All: Bridging the Health Divide</h2>
+    <p style="text-align: center; max-width: 800px; margin: 0 auto 3rem auto;">We believe that access to clear health information is a fundamental human right, not a privilege. MedInfo AI is engineered to be a great equalizer, reaching those most in need.</p>
+    <div class="grid-container">
+        <div class="grid-item">
+            <div class="icon">🗣️</div>
+            <h3>Simplicity for Literacy</h3>
+            <p>We're tearing down barriers. For those who find reading a challenge, our platform speaks your language—simple, clear, and visual. Our next leap? A voice-first interface that makes health knowledge as easy as a conversation.</p>
+        </div>
+        <div class="grid-item">
+            <div class="icon">💖</div>
+            <h3>Economic Empowerment</h3>
+            <p>This is health equity in action. We pinpoint the most affordable medicines and local health services, slashing healthcare costs for families and turning financial burdens into opportunities for better health.</p>
+        </div>
+        <div class="grid-item">
+            <div class="icon">🌍</div>
+            <h3>Strengthening Society</h3>
+            <p>A healthier individual creates a stronger society. By arming users against misinformation and championing preventive care, we're not just treating illness—we're building a global movement of proactive, informed, and resilient communities.</p>
+        </div>
+    </div>
+</div>
+
+<div class="about-section">
+    <h2>Our Arsenal of Technology</h2>
+    <p style="text-align: center; max-width: 800px; margin: 0 auto 3rem auto;">We've engineered MedInfo AI with a formidable, cutting-edge technology stack to ensure a flawless, fast, and intelligent experience.</p>
+    <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+        <div class="grid-item">
+            <div class="icon">🐍</div>
+            <h3>Flask & Python</h3>
+            <p>The robust, high-performance backbone of our application, orchestrating complex API integrations and business logic with speed and precision.</p>
+        </div>
+        <div class="grid-item">
+            <div class="icon">⚛️</div>
+            <h3>React, Vite & Tailwind</h3>
+            <p>A powerhouse combination delivering a blazing-fast, beautiful, and highly responsive user interface that feels fluid and intuitive on any device.</p>
+        </div>
+        <div class="grid-item">
+            <div class="icon">🧠</div>
+            <h3>Groq & Google AI</h3>
+            <p>The hyper-intelligent core of our platform. We use Groq for unparalleled response speed and Google's APIs for access to a vast repository of web data.</p>
+        </div>
+        <div class="grid-item">
+            <div class="icon">🗺️</div>
+            <h3>Mapping & Geolocation</h3>
+            <p>With Leaflet.js, our Kendra Finder tool provides dynamic, interactive maps to effortlessly guide you to nearby affordable medicine providers.</p>
+        </div>
+    </div>
+</div>
+
+<div class="about-section">
+    <h2>Our Vision for Tomorrow</h2>
+    <p style="text-align: center; max-width: 800px; margin: 0 auto 3rem auto;">Today is just the beginning. We are continuously innovating to build the future of personal health management. Here's a glimpse of what's next.</p>
+    <div class="grid-container">
+        <div class="grid-item">
+            <div class="icon">📱</div>
+            <h3>Personalized Health Hub</h3>
+            <p>This isn't just a dashboard; it's your personal mission control for health. A dynamic hub that learns from you, delivers predictive insights, and syncs with your life to keep you one step ahead.</p>
+        </div>
+        <div class="grid-item">
+            <div class="icon">🔔</div>
+            <h3>Smart Medication Reminders</h3>
+            <p>Forget simple alarms. Our smart reminders are your personal health concierge, delivering critical context, expert tips, and powerful motivation precisely when you need it.</p>
+        </div>
+        <div class="grid-item">
+            <div class="icon">🤝</div>
+            <h3>Community & Support</h3>
+            <p>You are not alone. We're building a vibrant, secure ecosystem where you can connect with peers, share your story, and draw strength from a global community that truly gets it.</p>
+        </div>
+    </div>
+</div>
+
+<div class="about-section">
+    <h2>Begin Your Journey to Clarity</h2>
+    <p style="text-align: center;">MedInfo AI is more than an app—it's a movement. A paradigm shift in personal wellness. The power is now in your hands. Dive in. Take control. Welcome to the future of you.</p>
+</div>
+
+<script>
+    const sections = document.querySelectorAll('.about-section');
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+
+    sections.forEach(section => {
+        observer.observe(section);
+    });
+</script>
+{% endblock %} 

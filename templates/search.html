@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block title %}Medicine Search - MedInfo AI{% endblock %}
+
+{% block content %}
+<section id="medicine-search" class="section full-width-container" style="padding: 2rem 3rem; margin: 0; display: flex; flex-direction: column; height: 100%;">
+    <h2 style="text-align: center; margin-bottom: 2rem;">Find About Your Medicine (Subsitutes, Alternatives, Uses, Side Effects, etc.)</h2>
+    <form id="search-form" style="margin-bottom: 2rem;">
+        <input type="text" id="medicine-input" placeholder="e.g., Crocin, Combiflam, Telma 40" required>
+        <button type="submit">Search</button>
+    </form>
+    <div id="loader" class="loader" style="display: none;"></div>
+    <div id="results-container" style="flex-grow: 1; overflow-y: auto;"></div>
+</section>
+{% endblock %} 

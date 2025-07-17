@@ -1,0 +1,100 @@
+{% extends "layout.html" %}
+{% block title %}Saved Items - MedInfo AI{% endblock %}
+
+{% block content %}
+<section id="save-future" class="section full-width-container" style="padding: 2rem 3rem; margin: 0; display: flex; flex-direction: column; height: 100%;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2 style="text-align: center;">Your Saved Items</h2>
+        <button id="clear-saved-btn" style="padding: 0.5rem 1rem; font-size: 0.9rem; background-color: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer;">Clear All</button>
+    </div>
+
+    <div class="add-item-form" style="margin-bottom: 2rem; display: flex; gap: 0.5rem;">
+        <input type="text" id="item-name-input" placeholder="Item Name" style="flex-grow: 1; padding: 0.5rem;">
+        <input type="text" id="item-details-input" placeholder="Price or Details" style="flex-grow: 1; padding: 0.5rem;">
+        <button id="add-item-btn" style="padding: 0.5rem 1rem; background-color: #3498db; color: white; border: none; border-radius: 8px;">Add Item</button>
+    </div>
+    
+    <div id="saved-items-container" class="saved-items-list" style="flex-grow: 1; overflow-y: auto;">
+        <!-- Saved items will be listed here -->
+    </div>
+</section>
+
+<style>
+.saved-items-list {
+    list-style: none;
+    padding: 0;
+}
+.saved-item {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('saved-items-container');
+
+    function renderSavedItems() {
+        const savedItems = JSON.parse(localStorage.getItem('savedItems')) || [];
+        container.innerHTML = '';
+
+        if (savedItems.length === 0) {
+            container.innerHTML = '<p>You have no saved items.</p>';
+            return;
+        }
+
+        savedItems.forEach(item => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'saved-item';
+            let itemDetails = `<strong>${item.name}</strong> - ${item.price}`;
+            if (item.store) {
+                itemDetails += ` (<em>${item.store}</em>)`;
+            }
+            itemElement.innerHTML = `<span>${itemDetails}</span>`;
+            container.appendChild(itemElement);
+        });
+    }
+
+    document.getElementById('add-item-btn').addEventListener('click', () => {
+        const nameInput = document.getElementById('item-name-input');
+        const detailsInput = document.getElementById('item-details-input');
+        const name = nameInput.value.trim();
+        const details = detailsInput.value.trim();
+
+        if (!name) {
+            alert('Please enter an item name.');
+            return;
+        }
+
+        const item = {
+            name: name,
+            price: details,
+            type: 'Manual Entry'
+        };
+        
+        let savedItems = JSON.parse(localStorage.getItem('savedItems')) || [];
+        savedItems.push(item);
+        localStorage.setItem('savedItems', JSON.stringify(savedItems));
+        
+        nameInput.value = '';
+        detailsInput.value = '';
+        renderSavedItems();
+    });
+
+    document.getElementById('clear-saved-btn').addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all saved items?')) {
+            localStorage.removeItem('savedItems');
+            renderSavedItems();
+        }
+    });
+
+    renderSavedItems();
+});
+</script>
+{% endblock %} 
