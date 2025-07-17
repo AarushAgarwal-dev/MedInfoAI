@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import React, { useState, useEffect } from 'react';
+import { MapContainer } from 'react-leaflet/MapContainer';
+import { TileLayer } from 'react-leaflet/TileLayer';
+import { Marker } from 'react-leaflet/Marker';
+import { Popup } from 'react-leaflet/Popup';
 import 'leaflet/dist/leaflet.css';
 
-const API = 'http://127.0.0.1:8000';
-const MAPBOX_TOKEN = 'YOUR_MAPBOX_ACCESS_TOKEN'; // Replace with your Mapbox token
+const API = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000';
 
 export default function Tools({ user }: { user: string }) {
   // Medicine Search

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const API = 'http://127.0.0.1:8000';
+const API = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000';
 
 export default function Auth({ onAuth }: { onAuth: (username: string) => void }) {
   const [mode, setMode] = useState<'login' | 'register'>('login');
