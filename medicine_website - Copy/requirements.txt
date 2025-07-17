@@ -1,6 +1,0 @@
-Flask
-python-dotenv
-requests
-groq
-beautifulsoup4
-lxml
