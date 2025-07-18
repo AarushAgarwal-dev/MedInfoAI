@@ -1,8 +1,6 @@
 # MedInfo AI
 
 Your Intelligent Health Companion  
-*(An open-source project by **Anshika Agarwal**, Grade 10)*
-
 ---
 
 ## 🚀 Quick Links
