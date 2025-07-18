@@ -7,8 +7,8 @@ Your Intelligent Health Companion
 
 - [Live Demo](#) <!-- Add your deployed link here -->
 - [Documentation](#)
-- [Open an Issue](https://github.com/your-username/medinfoai/issues)
-- [Pull Requests](https://github.com/your-username/medinfoai/pulls)
+- [Open an Issue](https://github.com/AarushAgarwal-dev/medinfoai/issues)
+- [Pull Requests](https://github.com/AarushAgarwal-dev/medinfoai/pulls)
 - [Contributing Guide](#-contributing)
 
 ---
@@ -331,9 +331,9 @@ Deploy the Flask app on your favourite PaaS (Railway, Render, Fly.io, etc.). Rem
 
 ## 🌐 Community & Support
 
-- **Discussions:** [GitHub Discussions](https://github.com/your-username/medinfo-ai/discussions)
-- **Issues:** [File an Issue](https://github.com/your-username/medinfo-ai/issues)
-- **Pull Requests:** [Contribute Code](https://github.com/your-username/medinfo-ai/pulls)
+- **Discussions:** [GitHub Discussions](https://github.com/AarushAgarwal-dev/medinfo-ai/discussions)
+- **Issues:** [File an Issue](https://github.com/AarushAgarwal-dev/medinfo-ai/issues)
+- **Pull Requests:** [Contribute Code](https://github.com/AarushAgarwal-dev/medinfo-ai/pulls)
 
 Join our community to ask questions, suggest features, or get help!
 
@@ -361,9 +361,7 @@ A: Most features work globally, but some (like Kendra Finder) are India-specific
 ## 📬 Contact & Support
 
 For questions, bug reports, or feature requests:
-- Open an [issue](https://github.com/your-username/medinfo-ai/issues)
-- Email: your.email@example.com
-- Twitter: [@yourhandle](https://twitter.com/yourhandle)
+- Open an [issue](https://github.com/AarushAgarwal-dev/medinfo-ai/issues)
 
 ---
 
@@ -392,7 +390,7 @@ This project is licensed under the **MIT License** – see [LICENSE](LICENSE) fo
 
 ## 📝 Changelog
 
-See [Releases](https://github.com/your-username/medinfoai/releases) for the latest updates and changelog.
+See [Releases](https://github.com//AarushAgarwal-dev/medinfoai/releases) for the latest updates and changelog.
 
 ---
 
@@ -408,7 +406,7 @@ Thanks to these amazing people:
 
 If you find MedInfo AI useful, please consider giving us a ⭐ star, sharing with friends, or contributing code/content!
 
-[![Star](https://img.shields.io/github/stars/your-username/medinfoai?style=social)](https://github.com/your-username/medinfoai)
-[![Forks](https://img.shields.io/github/forks/your-username/medinfoai?style=social)](https://github.com/your-username/medinfoai)
+[![Star](https://img.shields.io/github/stars/AarushAgarwal-dev/medinfoai?style=social)](https://github.com/AarushAgarwal-dev/medinfoai)
+[![Forks](https://img.shields.io/github/forks/AarushAgarwal-dev/medinfoai?style=social)](https://github.com/AarushAgarwal-dev/medinfoai)
 
 ---
