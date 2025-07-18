@@ -334,8 +334,6 @@ Deploy the Flask app on your favourite PaaS (Railway, Render, Fly.io, etc.). Rem
 - **Discussions:** [GitHub Discussions](https://github.com/your-username/medinfo-ai/discussions)
 - **Issues:** [File an Issue](https://github.com/your-username/medinfo-ai/issues)
 - **Pull Requests:** [Contribute Code](https://github.com/your-username/medinfo-ai/pulls)
-- **Email:** your.email@example.com
-- **Twitter:** [@yourhandle](https://twitter.com/yourhandle)
 
 Join our community to ask questions, suggest features, or get help!
 
