@@ -121,45 +121,10 @@ function displayError(message) {
 }
 
 // --- Kendra Finder Map with Real Locations ---
+// Moved to kendra_finder.html
 function initializeKendraFinder() {
-    const mapDiv = document.getElementById('kendra-map');
-    const kendraListDiv = document.getElementById('kendra-list');
-
-    if (!mapDiv || !window.L || mapDiv._leaflet_id) {
-        return; // Exit if no map div, no Leaflet, or map already initialized
-    }
-    const kendras = [
-        { name: 'Jan Aushadhi Kendra - Connaught Place', address: 'Shop No. 5, Palika Bazar, Connaught Place', city: 'Delhi', lat: 28.6315, lng: 77.2167 },
-        { name: 'Jan Aushadhi Kendra - Andheri', address: 'Shop 12, Andheri West, Near Station', city: 'Mumbai', lat: 19.1197, lng: 72.8468 },
-        { name: 'Jan Aushadhi Kendra - Jayanagar', address: 'No. 44, 4th Block, Jayanagar', city: 'Bangalore', lat: 12.9250, lng: 77.5938 },
-        { name: 'Jan Aushadhi Kendra - Salt Lake', address: 'CF-123, Sector 1, Salt Lake', city: 'Kolkata', lat: 22.5867, lng: 88.4172 },
-        { name: 'Jan Aushadhi Kendra - T Nagar', address: 'Shop 8, North Usman Road, T Nagar', city: 'Chennai', lat: 13.0446, lng: 80.2337 }
-    ];
-    const map = L.map('kendra-map').setView([22.9734, 78.6569], 5.2);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-
-    kendras.forEach(kendra => {
-        const marker = L.marker([kendra.lat, kendra.lng]).addTo(map);
-        marker.bindPopup(`<b>${kendra.name}</b><br>${kendra.address}<br>${kendra.city}`);
-    });
-
-    // This is the critical fix. It tells the map to re-check its size after
-    // the browser has finished rendering the page layout, ensuring it draws correctly.
-    setTimeout(function() {
-        map.invalidateSize();
-    }, 100);
-
-    if (kendraListDiv) {
-        kendraListDiv.innerHTML = kendras.map(k => `
-            <div class="kendra-card">
-                <h4>${k.name}</h4>
-                <div class="kendra-address">${k.address}</div>
-                <div class="kendra-city">${k.city}</div>
-            </div>
-        `).join('');
-    }
+    // Functionality moved to kendra_finder.html template
+    return;
 }
 
 // --- AI Assistant Chat UI ---

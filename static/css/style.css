@@ -304,32 +304,121 @@ footer { text-align: center; margin-top: 40px; color: var(--text-light); font-si
     gap: 18px;
 }
 .kendra-card {
-    background: #f4f7f6;
-    border: 1px solid #e0e7e5;
-    border-radius: 10px;
-    padding: 18px 16px 14px 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    transition: box-shadow 0.2s, transform 0.2s;
+    background-color: var(--card-bg);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.2s;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
 }
 .kendra-card:hover {
-    box-shadow: 0 6px 18px rgba(0,121,107,0.10);
-    transform: translateY(-2px) scale(1.02);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    border-color: var(--accent-color);
 }
 .kendra-card h4 {
-    margin: 0 0 6px 0;
-    color: var(--primary-hover);
-    font-size: 1.13em;
-    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: var(--primary-color);
+    font-size: 1.1rem;
 }
 .kendra-address {
     color: var(--text-color);
-    font-size: 1em;
     margin-bottom: 4px;
+    font-size: 0.95rem;
 }
 .kendra-city {
-    color: var(--accent-color);
-    font-size: 0.98em;
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+.kendra-distance {
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    padding-top: 6px;
+    border-top: 1px dashed var(--border-color);
+}
+
+/* Kendra Finder specific styles */
+.btn {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    background-color: #f0f0f0;
+    color: var(--text-color);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
     font-weight: 500;
+    transition: all 0.2s;
+}
+.btn:hover {
+    background-color: #e0e0e0;
+}
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+}
+.user-location-marker {
+    position: relative;
+    z-index: 1000;
+}
+.nearest-kendra-card {
+    line-height: 1.6;
+}
+.nearest-kendra-card h4 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+.nearest-kendra-card p {
+    margin: 0.4rem 0;
+}
+.nearest-kendra-card p:last-child {
+    margin-top: 1rem;
+}
+.kendra-popup h4 {
+    margin: 0 0 6px 0;
+    color: var(--primary-color);
+}
+.kendra-popup p {
+    margin: 3px 0;
+    font-size: 0.9rem;
+}
+/* Leaflet map styles */
+.leaflet-popup-content-wrapper {
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+.leaflet-popup-content {
+    margin: 12px 16px;
+    line-height: 1.5;
+}
+@media (max-width: 768px) {
+    .search-controls button {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    #kendra-map {
+        height: 400px;
+    }
+    
+    #kendra-grid {
+        grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 480px) {
+    #kendra-map {
+        height: 300px;
+    }
 }
 
 /* --- AI Assistant Chat Styles --- */

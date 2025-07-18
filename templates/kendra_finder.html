@@ -3,11 +3,490 @@
 
 {% block content %}
 <section id="kendra-finder" class="section full-width-container">
-    <h2 style="text-align: center; margin-bottom: 2rem;">Locate a Jan Aushadi Kendra</h2>
+    <div class="kendra-finder-container">
+        <h2 style="text-align: center; margin-bottom: 1.5rem;">Locate a Jan Aushadhi Kendra</h2>
+        
+        <div class="kendra-finder-description" style="max-width: 800px; margin: 0 auto 2rem; text-align: center;">
+            <p>Jan Aushadhi Kendras are special pharmacies that offer quality generic medicines at affordable prices. 
+            Find the nearest kendra to access essential medications at up to 90% lower costs than branded drugs.</p>
+        </div>
 
-    <!-- Diagnostic Step: Forcing the map container to be visible -->
-    <div id="kendra-map" style="border: 5px solid rgb(0, 255, 26); height: 500px; width: 100%;"></div>
+        <!-- Controls and Map Row -->
+        <div class="kendra-top-section">
+            <!-- Left side: Controls and filters -->
+            <div class="kendra-controls-section">
+                <div class="search-controls">
+                    <button id="find-nearest-btn" class="btn btn-primary">Find Nearest Kendra</button>
+                    <button id="show-all-btn" class="btn">Show All Kendras</button>
+                    <div id="location-status" style="margin-top: 1rem; font-style: italic;"></div>
+                </div>
+                
+                <div id="nearest-kendra-info" style="margin: 1.5rem 0; padding: 1.5rem; border-radius: 8px; background-color: #f9f9f9; display: none;">
+                    <h3 style="margin-top: 0;">Nearest Jan Aushadhi Kendra</h3>
+                    <div id="nearest-kendra-details"></div>
+                </div>
 
-    <div id="kendra-list" style="margin-top: 2rem;"></div>
+                <div class="filter-section" style="margin-top: 2rem;">
+                    <h3>Filter by City</h3>
+                    <div id="city-filter" class="filter-options">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right side: Map -->
+            <div class="kendra-map-section">
+                <div id="kendra-map"></div>
+            </div>
+        </div>
+        
+        <!-- Full-width Kendra List -->
+        <div class="kendra-list-section">
+            <div class="kendra-list-header">
+                <h3>All Jan Aushadhi Kendras</h3>
+                <span id="kendras-count" class="kendras-count">0 kendras found</span>
+            </div>
+            <div id="kendra-grid"></div>
+        </div>
+    </div>
 </section>
+
+<style>
+    .kendra-finder-container {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .kendra-top-section {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .kendra-controls-section {
+        padding-right: 2rem;
+        border-right: 1px solid #e0e0e0;
+    }
+    
+    .kendra-map-section {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    #kendra-map {
+        height: 500px;
+        width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .kendra-list-section {
+        margin-top: 2rem;
+    }
+    
+    #kendra-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+    
+    .filter-options {
+        margin-top: 1rem;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .filter-option {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-option label {
+        margin-left: 0.5rem;
+        cursor: pointer;
+    }
+    
+    .kendra-list-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .kendras-count {
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+    
+    @media (max-width: 1200px) {
+        #kendra-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 900px) {
+        .kendra-top-section {
+            grid-template-columns: 1fr;
+        }
+        
+        .kendra-controls-section {
+            padding-right: 0;
+            border-right: none;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        #kendra-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize variables
+    let map;
+    let markers = [];
+    let currentLocationMarker;
+    let userLat, userLng;
+    let allKendras = [];
+    let filteredKendras = [];
+    let selectedCity = '';
+    
+    const locationStatus = document.getElementById('location-status');
+    const nearestKendraInfo = document.getElementById('nearest-kendra-info');
+    const nearestKendraDetails = document.getElementById('nearest-kendra-details');
+    const kendraGrid = document.getElementById('kendra-grid');
+    const cityFilter = document.getElementById('city-filter');
+    const kendrasCount = document.getElementById('kendras-count');
+    
+    // Initialize map
+    function initMap() {
+        // Center on India
+        map = L.map('kendra-map').setView([20.5937, 78.9629], 5);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        
+        // Fix for map rendering issues
+        setTimeout(() => map.invalidateSize(), 100);
+        
+        // Load all kendras initially
+        loadAllKendras();
+    }
+    
+    // Load all Jan Aushadhi Kendras
+    function loadAllKendras() {
+        fetch('/jan-aushadhi-kendras')
+            .then(response => response.json())
+            .then(data => {
+                allKendras = data.kendras;
+                filteredKendras = [...allKendras];
+                displayKendras(filteredKendras);
+                
+                // Setup city filter
+                setupCityFilter(allKendras);
+                
+                // Update counter
+                updateKendrasCount();
+            })
+            .catch(error => {
+                console.error('Error fetching kendras:', error);
+                locationStatus.textContent = 'Error loading kendras. Please try again.';
+            });
+    }
+    
+    // Setup city filter based on available kendras
+    function setupCityFilter(kendras) {
+        // Get unique cities
+        const cities = [...new Set(kendras.map(kendra => kendra.city))].sort();
+        
+        // Clear existing options
+        cityFilter.innerHTML = '';
+        
+        // Add "All Cities" option
+        const allCitiesOption = document.createElement('div');
+        allCitiesOption.className = 'filter-option';
+        allCitiesOption.innerHTML = `
+            <input type="radio" id="city-all" name="city-filter" value="" checked>
+            <label for="city-all">All Cities</label>
+        `;
+        cityFilter.appendChild(allCitiesOption);
+        
+        // Add options for each city
+        cities.forEach(city => {
+            const cityCount = kendras.filter(k => k.city === city).length;
+            const option = document.createElement('div');
+            option.className = 'filter-option';
+            option.innerHTML = `
+                <input type="radio" id="city-${city.replace(/\s+/g, '-').toLowerCase()}" name="city-filter" value="${city}">
+                <label for="city-${city.replace(/\s+/g, '-').toLowerCase()}">${city} (${cityCount})</label>
+            `;
+            cityFilter.appendChild(option);
+        });
+        
+        // Add event listeners to filter options
+        document.querySelectorAll('input[name="city-filter"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                selectedCity = this.value;
+                filterKendras();
+            });
+        });
+    }
+    
+    // Filter kendras based on selected filters
+    function filterKendras() {
+        filteredKendras = allKendras;
+        
+        // Filter by city if selected
+        if (selectedCity) {
+            filteredKendras = filteredKendras.filter(kendra => kendra.city === selectedCity);
+        }
+        
+        // Update display
+        displayKendras(filteredKendras);
+        
+        // Update counter
+        updateKendrasCount();
+    }
+    
+    // Update kendras count
+    function updateKendrasCount() {
+        kendrasCount.textContent = `${filteredKendras.length} kendras found`;
+    }
+    
+    // Display kendras on map and in list
+    function displayKendras(kendras) {
+        // Clear existing markers
+        clearMarkers();
+        
+        // Add new markers
+        kendras.forEach(kendra => {
+            const marker = L.marker([kendra.lat, kendra.lng]).addTo(map);
+            marker.bindPopup(createPopupContent(kendra));
+            markers.push(marker);
+        });
+        
+        // Update kendra grid
+        updateKendraGrid(kendras);
+        
+        // Fit map bounds to show all markers
+        if (kendras.length > 0 && !currentLocationMarker) {
+            const bounds = L.latLngBounds(kendras.map(k => [k.lat, k.lng]));
+            map.fitBounds(bounds, { padding: [50, 50] });
+        }
+    }
+    
+    // Create popup content for marker
+    function createPopupContent(kendra) {
+        let content = `
+            <div class="kendra-popup">
+                <h4>${kendra.name}</h4>
+                <p>${kendra.address}</p>
+                <p>${kendra.city}</p>
+        `;
+        
+        if (kendra.distance) {
+            content += `<p><strong>Distance:</strong> ${kendra.distance} km</p>`;
+        }
+        
+        content += `<p><a href="https://maps.google.com/maps?q=${kendra.lat},${kendra.lng}" target="_blank" class="btn btn-sm">Open in Google Maps</a></p>`;
+        content += `</div>`;
+        return content;
+    }
+    
+    // Update kendra grid with list of kendras
+    function updateKendraGrid(kendras) {
+        kendraGrid.innerHTML = '';
+        
+        kendras.forEach(kendra => {
+            const kendraCard = document.createElement('div');
+            kendraCard.className = 'kendra-card';
+            kendraCard.innerHTML = `
+                <h4>${kendra.name}</h4>
+                <div class="kendra-address">${kendra.address}</div>
+                <div class="kendra-city">${kendra.city}</div>
+                ${kendra.distance ? `<div class="kendra-distance"><strong>Distance:</strong> ${kendra.distance} km</div>` : ''}
+                <div class="kendra-actions" style="margin-top: 0.8rem;">
+                    <a href="https://maps.google.com/maps?q=${kendra.lat},${kendra.lng}" target="_blank" class="btn btn-sm">View in Maps</a>
+                </div>
+            `;
+            
+            kendraCard.addEventListener('click', () => {
+                map.setView([kendra.lat, kendra.lng], 15);
+                const marker = markers.find(m => m.getLatLng().lat === kendra.lat && m.getLatLng().lng === kendra.lng);
+                if (marker) {
+                    marker.openPopup();
+                }
+            });
+            
+            kendraGrid.appendChild(kendraCard);
+        });
+    }
+    
+    // Clear all markers from the map
+    function clearMarkers() {
+        markers.forEach(marker => map.removeLayer(marker));
+        markers = [];
+    }
+    
+    // Get user's current location
+    function getUserLocation() {
+        locationStatus.textContent = 'Locating you...';
+        
+        if (!navigator.geolocation) {
+            locationStatus.textContent = 'Geolocation is not supported by your browser.';
+            return;
+        }
+        
+        navigator.geolocation.getCurrentPosition(position => {
+            userLat = position.coords.latitude;
+            userLng = position.coords.longitude;
+            
+            // Add marker for user's location
+            if (currentLocationMarker) {
+                map.removeLayer(currentLocationMarker);
+            }
+            
+            currentLocationMarker = L.marker([userLat, userLng], {
+                icon: L.divIcon({
+                    className: 'user-location-marker',
+                    html: '<div style="background-color: #2196F3; border: 2px solid white; border-radius: 50%; width: 15px; height: 15px;"></div>',
+                    iconSize: [15, 15],
+                    iconAnchor: [7, 7]
+                })
+            }).addTo(map);
+            
+            // Find nearest kendras
+            findNearestKendras();
+            
+        }, error => {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    locationStatus.textContent = 'Location permission denied. Please enable location services.';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    locationStatus.textContent = 'Location information unavailable.';
+                    break;
+                case error.TIMEOUT:
+                    locationStatus.textContent = 'Location request timed out.';
+                    break;
+                default:
+                    locationStatus.textContent = 'An unknown error occurred while getting your location.';
+                    break;
+            }
+        });
+    }
+    
+    // Find nearest kendras based on user location
+    function findNearestKendras() {
+        fetch('/jan-aushadhi-kendras', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                lat: userLat,
+                lng: userLng
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                locationStatus.textContent = data.error;
+                return;
+            }
+            
+            // Reset any city filters
+            document.getElementById('city-all').checked = true;
+            selectedCity = '';
+            
+            // Display nearest kendras
+            filteredKendras = data.kendras;
+            displayKendras(filteredKendras);
+            
+            // Update counter
+            updateKendrasCount();
+            
+            // Show nearest kendra info
+            displayNearestKendra(data.nearest);
+            
+            // Update status
+            locationStatus.textContent = 'Found nearest Jan Aushadhi Kendras to your location.';
+            
+            // Adjust map view to show both user location and nearest kendra
+            if (data.nearest) {
+                const bounds = L.latLngBounds(
+                    L.latLng(userLat, userLng),
+                    L.latLng(data.nearest.lat, data.nearest.lng)
+                );
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
+        })
+        .catch(error => {
+            console.error('Error finding nearest kendras:', error);
+            locationStatus.textContent = 'Error finding nearest kendras. Please try again.';
+        });
+    }
+    
+    // Display nearest kendra information
+    function displayNearestKendra(kendra) {
+        if (!kendra) {
+            nearestKendraInfo.style.display = 'none';
+            return;
+        }
+        
+        nearestKendraDetails.innerHTML = `
+            <div class="nearest-kendra-card">
+                <h4>${kendra.name}</h4>
+                <p><strong>Address:</strong> ${kendra.address}</p>
+                <p><strong>City:</strong> ${kendra.city}</p>
+                <p><strong>Distance:</strong> ${kendra.distance} km</p>
+                <p><a href="https://maps.google.com/maps?q=${kendra.lat},${kendra.lng}" target="_blank" class="btn btn-sm">Open in Google Maps</a></p>
+            </div>
+        `;
+        
+        nearestKendraInfo.style.display = 'block';
+    }
+    
+    // Event listeners
+    document.getElementById('find-nearest-btn').addEventListener('click', getUserLocation);
+    
+    document.getElementById('show-all-btn').addEventListener('click', () => {
+        // Reset filters
+        document.getElementById('city-all').checked = true;
+        selectedCity = '';
+        
+        // Show all kendras
+        filteredKendras = allKendras;
+        displayKendras(filteredKendras);
+        
+        // Update counter
+        updateKendrasCount();
+        
+        // Hide nearest kendra info
+        nearestKendraInfo.style.display = 'none';
+        
+        // Update status
+        locationStatus.textContent = 'Showing all Jan Aushadhi Kendras in India.';
+        
+        // Reset map view
+        map.setView([20.5937, 78.9629], 5);
+        
+        // Remove user location marker if exists
+        if (currentLocationMarker) {
+            map.removeLayer(currentLocationMarker);
+            currentLocationMarker = null;
+        }
+    });
+    
+    // Initialize map
+    initMap();
+});
+</script>
 {% endblock %} 

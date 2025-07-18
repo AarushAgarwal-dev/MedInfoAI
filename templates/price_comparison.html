@@ -3,19 +3,44 @@
 
 {% block content %}
 <section id="price-comparison" class="section full-width-container" style="padding: 2rem 3rem; margin: 0; display: flex; flex-direction: column; height: 100%;">
-    <h2 style="text-align: center; margin-bottom: 2rem;">Compare Medicine Prices</h2>
+    <h2 style="text-align: center; margin-bottom: 2rem;">Medicine Price Tools</h2>
     
-    <div class="search-form" style="display: flex; justify-content: center; margin-bottom: 2rem;">
-        <input type="text" id="medicine-name-input" placeholder="Enter medicine name..." style="width: 50%; padding: 0.75rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 8px 0 0 8px;">
-        <button id="search-price-btn" style="padding: 0.75rem 1.5rem; font-size: 1rem; background-color: #3498db; color: white; border: none; border-radius: 0 8px 8px 0; cursor: pointer;">Search</button>
+    <!-- Tab navigation -->
+    <div class="tab-navigation" style="display: flex; justify-content: center; margin-bottom: 2rem;">
+        <button class="tab-button active" data-tab="price-compare" style="padding: 0.75rem 1.5rem; font-size: 1rem; background-color: #3498db; color: white; border: none; border-radius: 8px 0 0 8px; cursor: pointer;">Price Comparison</button>
+        <button class="tab-button" data-tab="alternative-medicine" style="padding: 0.75rem 1.5rem; font-size: 1rem; background-color: #e0e0e0; color: #333; border: none; border-radius: 0 8px 8px 0; cursor: pointer;">Alternative Medicines</button>
     </div>
+    
+    <!-- Price comparison tab -->
+    <div id="price-compare-tab" class="tab-content" style="display: block; flex-grow: 1;">
+        <div class="search-form" style="display: flex; justify-content: center; margin-bottom: 2rem;">
+            <input type="text" id="medicine-name-input" placeholder="Enter medicine name..." style="width: 50%; padding: 0.75rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 8px 0 0 8px;">
+            <button id="search-price-btn" style="padding: 0.75rem 1.5rem; font-size: 1rem; background-color: #3498db; color: white; border: none; border-radius: 0 8px 8px 0; cursor: pointer;">Search</button>
+        </div>
 
-    <div id="price-results-container" class="tool-card" style="flex-grow: 1; overflow-y: auto; display: none;">
-        <!-- Price comparison results will be displayed here as a table -->
+        <div id="price-results-container" class="tool-card" style="flex-grow: 1; overflow-y: auto; display: none;">
+            <!-- Price comparison results will be displayed here as a table -->
+        </div>
+        <div id="loader" style="display: none; text-align: center; margin-top: 2rem;">
+            <p>Searching for the best prices...</p>
+            <div class="spinner"></div> <!-- Basic spinner -->
+        </div>
     </div>
-    <div id="loader" style="display: none; text-align: center; margin-top: 2rem;">
-        <p>Searching for the best prices...</p>
-        <div class="spinner"></div> <!-- Basic spinner -->
+    
+    <!-- Alternative medicine tab -->
+    <div id="alternative-medicine-tab" class="tab-content" style="display: none; flex-grow: 1;">
+        <div class="search-form" style="display: flex; justify-content: center; margin-bottom: 2rem;">
+            <input type="text" id="alt-medicine-name-input" placeholder="Enter medicine name..." style="width: 50%; padding: 0.75rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 8px 0 0 8px;">
+            <button id="search-alt-btn" style="padding: 0.75rem 1.5rem; font-size: 1rem; background-color: #3498db; color: white; border: none; border-radius: 0 8px 8px 0; cursor: pointer;">Find Alternatives</button>
+        </div>
+
+        <div id="alt-results-container" class="tool-card" style="flex-grow: 1; overflow-y: auto; display: none;">
+            <!-- Alternative medicine results will be displayed here -->
+        </div>
+        <div id="alt-loader" style="display: none; text-align: center; margin-top: 2rem;">
+            <p>Searching for alternative medicines...</p>
+            <div class="spinner"></div> <!-- Basic spinner -->
+        </div>
     </div>
 </section>
 
@@ -65,9 +90,266 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+.original-medicine {
+    background-color: #f0f7ff;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+}
+.tab-button.active {
+    background-color: #3498db;
+    color: white;
+}
+.tab-button:not(.active) {
+    background-color: #e0e0e0;
+    color: #333;
+}
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+.alternative-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.alternative-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+.alternative-card h4 {
+    margin-top: 0;
+    color: #3498db;
+}
+.price-comparison {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+.price-comparison .price {
+    font-weight: bold;
+}
+.price-comparison .savings {
+    margin-left: 15px;
+    color: #28a745;
+    font-weight: bold;
+}
+.ingredients {
+    color: #666;
+    font-style: italic;
+    margin: 5px 0;
+}
+.medicine-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 15px;
+    border: 1px solid #ddd;
+}
+.medicine-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.medicine-info {
+    flex: 1;
+}
+.medicine-category {
+    display: inline-block;
+    background-color: #e8f4fd;
+    color: #3498db;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+.confidence-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    margin-left: 10px;
+    background-color: #e8f4fd;
+    color: #3498db;
+}
+.confidence-high {
+    background-color: #d4edda;
+    color: #28a745;
+}
+.confidence-medium {
+    background-color: #fff3cd;
+    color: #ffc107;
+}
+.no-results {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+.alternatives-count {
+    background-color: #3498db;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    margin-left: 10px;
+    display: inline-block;
+}
+.best-deal-badge {
+    background-color: #28a745;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    margin-left: 10px;
+    display: inline-block;
+}
+.price-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.price-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+.price-card.best-deal {
+    border-left: 4px solid #28a745;
+    background-color: #f8fff9;
+}
+.store-logo {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5;
+    border-radius: 50%;
+    margin-right: 15px;
+    font-weight: bold;
+    color: #3498db;
+}
+.price-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.price-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+.price-amount {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+}
+.price-quantity {
+    color: #666;
+    font-size: 0.9rem;
+}
+.price-discount {
+    color: #28a745;
+    font-weight: bold;
+    margin-left: 10px;
+}
+.price-delivery {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+.medicine-summary {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+.medicine-details {
+    flex: 1;
+}
+.medicine-form {
+    display: inline-block;
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    margin-right: 8px;
+}
+.medicine-strength {
+    display: inline-block;
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+.savings-highlight {
+    background-color: #d4edda;
+    color: #28a745;
+    padding: 8px 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.price-sort-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+.sort-btn {
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    padding: 5px 10px;
+    margin-left: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+.sort-btn.active {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
+}
 </style>
 
 <script>
+// Tab switching functionality
+document.querySelectorAll('.tab-button').forEach(button => {
+    button.addEventListener('click', () => {
+        // Update button styles
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.classList.remove('active');
+            btn.style.backgroundColor = '#e0e0e0';
+            btn.style.color = '#333';
+        });
+        button.classList.add('active');
+        button.style.backgroundColor = '#3498db';
+        button.style.color = 'white';
+        
+        // Show the selected tab content
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.style.display = 'none';
+        });
+        document.getElementById(button.dataset.tab + '-tab').style.display = 'block';
+    });
+});
+
+// Price comparison functionality
 document.getElementById('search-price-btn').addEventListener('click', async () => {
     const medicineName = document.getElementById('medicine-name-input').value.trim();
     if (!medicineName) {
@@ -100,29 +382,108 @@ document.getElementById('search-price-btn').addEventListener('click', async () =
         resultsContainer.style.display = 'block';
 
         if (data.prices && data.prices.length > 0) {
-            let tableHtml = `<h3>Prices for ${data.medicine_name}</h3>
-                             <table class="price-table">
-                                 <thead>
-                                     <tr>
-                                         <th>Store</th>
-                                         <th>Price</th>
-                                         <th>Link</th>
-                                         <th>Action</th>
-                                     </tr>
-                                 </thead>
-                                 <tbody>`;
+            let html = '';
+            
+            // Add medicine summary with image if available
+            html += `<div class="medicine-summary">
+                        ${data.image_url ? 
+                          `<img src="${data.image_url}" class="medicine-image" alt="${data.medicine_name}">` : 
+                          `<div class="medicine-image" style="display: flex; align-items: center; justify-content: center; background-color: #f5f5f5;">
+                            <span style="font-size: 24px; color: #aaa;">Rx</span>
+                          </div>`}
+                        <div class="medicine-details">
+                            <h3>${data.medicine_name}</h3>
+                            ${data.medicine_info && data.medicine_info.manufacturer ? 
+                              `<p>Manufacturer: ${data.medicine_info.manufacturer}</p>` : ''}
+                            <div>
+                                ${data.medicine_info && data.medicine_info.form ? 
+                                  `<span class="medicine-form">${data.medicine_info.form}</span>` : ''}
+                                ${data.medicine_info && data.medicine_info.strength ? 
+                                  `<span class="medicine-strength">${data.medicine_info.strength}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+            
+            // Add savings highlight if available
+            const lowestPriceItem = data.prices.find(item => item.savings_percent);
+            if (lowestPriceItem && lowestPriceItem.savings_percent) {
+                html += `<div class="savings-highlight">
+                            <span>Save up to ${lowestPriceItem.savings_percent}% by comparing prices</span>
+                            <span>${data.prices.length} stores compared</span>
+                        </div>`;
+            }
+            
+            // Add sorting controls
+            html += `<div class="price-sort-controls">
+                        <span>Sort by:</span>
+                        <button class="sort-btn active" data-sort="price">Price</button>
+                        <button class="sort-btn" data-sort="store">Store</button>
+                    </div>`;
+            
+            // Display each price as a card
             data.prices.forEach(item => {
-                tableHtml += `<tr>
-                                  <td>${item.store}</td>
-                                  <td>${item.price}</td>
-                                  <td><a href="${item.url}" target="_blank">Visit Store</a></td>
-                                  <td><button class="save-item-btn" data-name="${data.medicine_name}" data-price="${item.price}" data-store="${item.store}">Save</button></td>
-                              </tr>`;
+                const storeInitial = item.store ? item.store.charAt(0).toUpperCase() : 'S';
+                
+                html += `<div class="price-card ${item.best_deal ? 'best-deal' : ''}" data-price="${item.numeric_price || 0}" data-store="${item.store || ''}">
+                            <div class="price-header">
+                                <div class="store-logo">${storeInitial}</div>
+                                <div>
+                                    <h4>${item.store}${item.best_deal ? '<span class="best-deal-badge">Best Deal</span>' : ''}</h4>
+                                    ${item.quantity ? `<div class="price-quantity">${item.quantity}</div>` : ''}
+                                </div>
+                            </div>
+                            <div class="price-details">
+                                <div>
+                                    <div class="price-amount">${item.price}</div>
+                                    ${item.discount ? `<span class="price-discount">${item.discount}</span>` : ''}
+                                    ${item.delivery_info ? `<div class="price-delivery">${item.delivery_info}</div>` : ''}
+                                </div>
+                                <div>
+                                    <a href="${item.url}" target="_blank" class="btn btn-primary" style="background-color: #3498db; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; margin-right: 10px;">Visit Store</a>
+                                    <button class="save-item-btn" data-name="${data.medicine_name}" data-price="${item.price}" data-store="${item.store}" data-quantity="${item.quantity || ''}">Save</button>
+                                </div>
+                            </div>
+                        </div>`;
             });
-            tableHtml += '</tbody></table>';
-            resultsContainer.innerHTML = tableHtml;
+            
+            resultsContainer.innerHTML = html;
+            
+            // Add sorting functionality
+            document.querySelectorAll('.sort-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update active state
+                    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    const sortType = btn.dataset.sort;
+                    const cards = Array.from(document.querySelectorAll('.price-card'));
+                    const container = document.querySelector('.price-sort-controls').parentNode;
+                    
+                    // Remove existing cards
+                    cards.forEach(card => card.remove());
+                    
+                    // Sort cards
+                    if (sortType === 'price') {
+                        cards.sort((a, b) => parseFloat(a.dataset.price) - parseFloat(b.dataset.price));
+                    } else if (sortType === 'store') {
+                        cards.sort((a, b) => a.dataset.store.localeCompare(b.dataset.store));
+                    }
+                    
+                    // Re-append cards
+                    cards.forEach(card => container.appendChild(card));
+                });
+            });
+            
         } else {
-            resultsContainer.innerHTML = `<p>Could not find any price information for "${medicineName}".</p>`;
+            resultsContainer.innerHTML = `<div class="no-results">
+                                            <p>Could not find any price information for "${medicineName}".</p>
+                                            <p>This could be because:</p>
+                                            <ul style="text-align: left; max-width: 500px; margin: 0 auto;">
+                                                <li>The medicine name might be misspelled</li>
+                                                <li>This medicine might not be available online</li>
+                                                <li>Limited information available in our database</li>
+                                            </ul>
+                                        </div>`;
         }
     } catch (error) {
         loader.style.display = 'none';
@@ -131,16 +492,139 @@ document.getElementById('search-price-btn').addEventListener('click', async () =
     }
 });
 
+// Alternative medicine functionality
+document.getElementById('search-alt-btn').addEventListener('click', async () => {
+    const medicineName = document.getElementById('alt-medicine-name-input').value.trim();
+    if (!medicineName) {
+        alert('Please enter a medicine name.');
+        return;
+    }
+
+    const resultsContainer = document.getElementById('alt-results-container');
+    const loader = document.getElementById('alt-loader');
+
+    resultsContainer.style.display = 'none';
+    resultsContainer.innerHTML = '';
+    loader.style.display = 'block';
+
+    try {
+        const response = await fetch('/alternative-medicine-price', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ medicine_name: medicineName })
+        });
+
+        loader.style.display = 'none';
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'An unknown error occurred.');
+        }
+
+        const data = await response.json();
+        resultsContainer.style.display = 'block';
+        
+        // Display original medicine info
+        let html = `<div class="original-medicine">
+                        <div class="medicine-header">
+                            ${data.original_medicine.image_url ? 
+                              `<img src="${data.original_medicine.image_url}" class="medicine-image" alt="${data.original_medicine.name}">` : 
+                              `<div class="medicine-image" style="display: flex; align-items: center; justify-content: center; background-color: #f5f5f5;">
+                                <span style="font-size: 24px; color: #aaa;">Rx</span>
+                              </div>`}
+                            <div class="medicine-info">
+                                <h3>${data.original_medicine.name}</h3>
+                                <p class="ingredients">Active Ingredients: ${data.original_medicine.active_ingredients.join(', ')}</p>
+                                ${data.original_medicine.category !== 'Not available' ? 
+                                  `<span class="medicine-category">${data.original_medicine.category}</span>` : ''}
+                            </div>
+                        </div>
+                        <p><strong>Price:</strong> ${data.original_medicine.price}</p>
+                        ${data.original_medicine.primary_use !== 'Not available' ? 
+                          `<p><strong>Primary Use:</strong> ${data.original_medicine.primary_use}</p>` : ''}
+                    </div>`;
+        
+        // Display alternatives
+        if (data.alternatives && data.alternatives.length > 0) {
+            html += `<h3>Alternative Medicines <span class="alternatives-count">${data.alternatives.length}</span></h3>`;
+            
+            data.alternatives.forEach(alt => {
+                // Determine confidence class
+                let confidenceClass = 'confidence-medium';
+                if (alt.confidence >= 90) confidenceClass = 'confidence-high';
+                
+                html += `<div class="alternative-card">
+                            <h4>${alt.name}
+                                <span class="confidence-badge ${confidenceClass}">${alt.confidence}% match</span>
+                            </h4>
+                            ${alt.manufacturer ? `<p><strong>Manufacturer:</strong> ${alt.manufacturer}</p>` : ''}
+                            <p class="ingredients"><strong>Active Ingredients:</strong> ${alt.active_ingredients}</p>
+                            ${alt.price ? `<div class="price-comparison">
+                                <span class="price"><strong>Price:</strong> ${alt.price}</span>
+                            </div>` : '<p>Price information not available</p>'}
+                            <button class="save-item-btn" data-name="${alt.name}" data-price="${alt.price || 'Not available'}" data-ingredients="${alt.active_ingredients}" data-manufacturer="${alt.manufacturer || ''}">Save</button>
+                        </div>`;
+            });
+        } else {
+            html += `<div class="no-results">
+                        <p>No alternative medicines found for "${medicineName}".</p>
+                        <p>This could be because:</p>
+                        <ul style="text-align: left; max-width: 500px; margin: 0 auto;">
+                            <li>The medicine has unique formulation</li>
+                            <li>The medicine name might be misspelled</li>
+                            <li>Limited information available in our database</li>
+                        </ul>
+                    </div>`;
+        }
+        
+        resultsContainer.innerHTML = html;
+    } catch (error) {
+        loader.style.display = 'none';
+        resultsContainer.style.display = 'block';
+        resultsContainer.innerHTML = `<p>Error: ${error.message}</p>`;
+    }
+});
+
+// Save functionality
 document.getElementById('price-results-container').addEventListener('click', (event) => {
     if (event.target.classList.contains('save-item-btn')) {
         const item = {
             name: event.target.dataset.name,
             price: event.target.dataset.price,
             store: event.target.dataset.store,
+            quantity: event.target.dataset.quantity || '',
             type: 'Medication'
         };
         saveItem(item);
-        alert('Item saved!');
+        event.target.textContent = 'Saved!';
+        event.target.disabled = true;
+        event.target.style.backgroundColor = '#6c757d';
+        setTimeout(() => {
+            event.target.textContent = 'Save';
+            event.target.disabled = false;
+            event.target.style.backgroundColor = '#28a745';
+        }, 2000);
+    }
+});
+
+document.getElementById('alt-results-container').addEventListener('click', (event) => {
+    if (event.target.classList.contains('save-item-btn')) {
+        const item = {
+            name: event.target.dataset.name,
+            price: event.target.dataset.price,
+            ingredients: event.target.dataset.ingredients,
+            manufacturer: event.target.dataset.manufacturer || 'Unknown',
+            type: 'Alternative Medication'
+        };
+        saveItem(item);
+        event.target.textContent = 'Saved!';
+        event.target.disabled = true;
+        event.target.style.backgroundColor = '#6c757d';
+        setTimeout(() => {
+            event.target.textContent = 'Save';
+            event.target.disabled = false;
+            event.target.style.backgroundColor = '#28a745';
+        }, 2000);
     }
 });
 
