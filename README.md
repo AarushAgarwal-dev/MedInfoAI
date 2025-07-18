@@ -105,17 +105,6 @@ Coming soon! (Feel free to open a PR with screenshots or a screencast.)
 
 ---
 
-## 📸 Screenshots
-
-> _Help us showcase MedInfo AI!_
-> 
-> Add screenshots of the search, AI assistant, price comparison, Kendra Finder, and blog features here. 
-> 
-> ![Screenshot Placeholder](screenshots/feature1.png)
-> 
-> _Open a PR to add your screenshots!_
-
----
 
 ## 🧩 Core API Endpoints
 
