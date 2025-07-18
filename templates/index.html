@@ -1,181 +1,534 @@
 {% extends "layout.html" %}
 {% block title %}Home - MedInfo AI{% endblock %}
 
-{% block content %}
+{% block head %}
 <style>
+    /* Hero section styling */
     .hero-section {
-        background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(155, 89, 182, 0.1));
-        padding: 0;
+        background: linear-gradient(135deg, rgba(0, 121, 107, 0.05), rgba(77, 182, 172, 0.1));
+        padding: 4rem 2rem;
         text-align: center;
-        border-radius: 16px;
-        margin-bottom: 4rem;
+        border-radius: var(--radius-lg);
+        margin: 2rem auto;
+        max-width: 1200px;
+        position: relative;
+        overflow: hidden;
     }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(0, 121, 107, 0.1) 0%, rgba(0, 121, 107, 0) 70%);
+        top: -100px;
+        right: -100px;
+        z-index: 0;
+    }
+    
+    .hero-section::after {
+        content: '';
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(77, 182, 172, 0.1) 0%, rgba(77, 182, 172, 0) 70%);
+        bottom: -50px;
+        left: -50px;
+        z-index: 0;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+    
     .hero-section h1 {
         font-size: 3.5rem;
         font-weight: 800;
-        color: #2c3e50;
-        margin-bottom: 1rem;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
     }
+    
     .hero-section p {
         font-size: 1.25rem;
-        color: #34495e;
+        color: var(--text-light);
         max-width: 800px;
-        margin: 0 auto 2rem auto;
+        margin: 0 auto 2.5rem auto;
+        line-height: 1.6;
     }
-    .hero-section .cta-button {
-        background-color: #3498db;
+    
+    .hero-section .logo {
+        height: 180px;
+        margin-bottom: 2rem;
+        transition: transform 0.5s ease;
+    }
+    
+    .hero-section .logo:hover {
+        transform: scale(1.05);
+    }
+    
+    .cta-button {
+        display: inline-block;
+        background-color: var(--primary-color);
         color: white;
         padding: 1rem 2.5rem;
-        border-radius: 8px;
+        border-radius: var(--radius-md);
         text-decoration: none;
         font-weight: 600;
         font-size: 1.1rem;
-        transition: background-color 0.3s, transform 0.3s;
-        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(0, 121, 107, 0.3);
+        position: relative;
+        overflow: hidden;
     }
-    .hero-section .cta-button:hover {
-        background-color: #2980b9;
+    
+    .cta-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .cta-button:hover {
+        background-color: var(--primary-hover);
         transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 121, 107, 0.4);
     }
-
+    
+    .cta-button:hover::before {
+        transform: translateX(0);
+    }
+    
+    /* Features section styling */
     .features-section {
+        padding: 4rem 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .section-title {
+        text-align: center;
+        margin-bottom: 3rem;
+        position: relative;
+    }
+    
+    .section-title h2 {
+        font-size: 2.5rem;
+        color: var(--text-color);
+        margin-bottom: 1rem;
+    }
+    
+    .section-title p {
+        color: var(--text-light);
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    
+    .section-title::after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 4px;
+        background-color: var(--primary-color);
+        margin: 1.5rem auto 0;
+        border-radius: 2px;
+    }
+    
+    .features-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 2.5rem;
-        text-align: center;
     }
+    
     .feature-card {
-        background-color: #ffffff;
+        background-color: white;
         padding: 2.5rem;
-        border-radius: 16px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-        transition: transform 0.3s, box-shadow 0.3s;
-        height: 100%; /* Ensure cards have same height */
-    }
-    .feature-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 40px rgba(0,0,0,0.12);
-    }
-    .feature-card .icon {
-        font-size: 3rem;
-        color: #3498db;
-        margin-bottom: 1.5rem;
-    }
-    .feature-card h3 {
-        font-size: 1.75rem;
-        color: #2c3e50;
-        margin-bottom: 1rem;
-    }
-    .feature-card p {
-        color: #7f8c8d;
-        line-height: 1.6;
-    }
-    .feature-link {
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
         text-decoration: none;
         color: inherit;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+    
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: var(--primary-color);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
+        z-index: -1;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .feature-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .feature-card .icon {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .feature-card:hover .icon {
+        transform: scale(1.1);
+    }
+    
+    .feature-card h3 {
+        font-size: 1.75rem;
+        color: var(--text-color);
+        margin-bottom: 1rem;
+    }
+    
+    .feature-card p {
+        color: var(--text-light);
+        line-height: 1.6;
+        flex-grow: 1;
+    }
+    
+    /* Benefits section styling */
+    .benefits-section {
+        background-color: #f8f9fa;
+        padding: 5rem 2rem;
+        margin-top: 3rem;
+    }
+    
+    .benefits-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .benefits-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2.5rem;
+    }
+    
+    .benefit-card {
+        background-color: white;
+        padding: 2rem;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s;
+        text-align: center;
+    }
+    
+    .benefit-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .benefit-card .icon {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+        display: inline-block;
+        padding: 1rem;
+        border-radius: 50%;
+        background-color: rgba(0, 121, 107, 0.1);
+    }
+    
+    .benefit-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .benefit-card p {
+        color: var(--text-light);
+    }
+    
+    /* How it works section styling */
+    .how-it-works-section {
+        padding: 5rem 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .steps-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 4rem;
+        position: relative;
+    }
+    
+    .steps-container::before {
+        content: '';
+        position: absolute;
+        top: 3rem;
+        left: 50%;
+        width: 80%;
+        height: 2px;
+        background-color: #e0e0e0;
+        transform: translateX(-50%);
+        z-index: 0;
+    }
+    
+    .step {
+        text-align: center;
+        width: 250px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .step-number {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 5px 15px rgba(0, 121, 107, 0.3);
+    }
+    
+    .step h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .step p {
+        color: var(--text-light);
+    }
+    
+    /* CTA section styling */
+    .cta-section {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        padding: 5rem 2rem;
+        text-align: center;
+        color: white;
+        margin-top: 4rem;
+    }
+    
+    .cta-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .cta-section h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+        color: white;
+    }
+    
+    .cta-section p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+    
+    .cta-button-white {
+        display: inline-block;
+        background-color: white;
+        color: var(--primary-color);
+        padding: 1rem 2.5rem;
+        border-radius: var(--radius-md);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .cta-button-white:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        background-color: #f0f0f0;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .hero-section h1 {
+            font-size: 2.5rem;
+        }
+        
+        .hero-section p {
+            font-size: 1.1rem;
+        }
+        
+        .hero-section .logo {
+            height: 150px;
+        }
+        
+        .section-title h2 {
+            font-size: 2rem;
+        }
+        
+        .steps-container::before {
+            display: none;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .hero-section h1 {
+            font-size: 2rem;
+        }
+        
+        .hero-section .logo {
+            height: 120px;
+        }
+        
+        .cta-button {
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+        }
     }
 </style>
+{% endblock %}
 
-<div class="hero-section">
-    <img src="{{ url_for('static', filename='img/logo_no_bg.png') }}" alt="MedInfoAI Logo" style="height: 400px; margin-bottom: 0;">
-    <h1>Navigating Your Health with Confidence</h1>
-    <p>In a world overflowing with complex medical information, finding clear, reliable answers can be overwhelming. MedInfoAI cuts through the noise, providing instant, AI-powered insights into your medications, helping you make informed decisions for your well-being.</p>
-    <a href="{{ url_for('search_page') }}" class="cta-button">Start Your Search</a>
-</div>
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content">
+        <img src="{{ url_for('static', filename='img/logo_no_bg.png') }}" alt="MedInfoAI Logo" class="logo">
+        <h1>Navigating Your Health with Confidence</h1>
+        <p>In a world overflowing with complex medical information, finding clear, reliable answers can be overwhelming. MedInfoAI cuts through the noise, providing instant, AI-powered insights into your medications, helping you make informed decisions for your well-being.</p>
+        <a href="{{ url_for('search_page') }}" class="cta-button">Start Your Search</a>
+    <a href="{{ url_for('ai_assistant_page') }}" class="cta-button" style="margin-left: 1rem; background-color: #00796b; color: #fff;">
+        <span style="vertical-align: middle;">💬</span> AI Search
+    </a>
+    </div>
+</section>
 
-<div class="features-section">
-    <a href="{{ url_for('search_page') }}" class="feature-link">
-        <div class="feature-card">
+<!-- Features Section -->
+<section class="features-section">
+    <div class="section-title">
+        <h2>Powerful Features</h2>
+        <p>Discover the tools that make MedInfoAI your complete medication information companion</p>
+    </div>
+    
+    <div class="features-grid">
+        <a href="{{ url_for('search_page') }}" class="feature-card">
             <div class="icon">🔍</div>
             <h3>Comprehensive Drug Search</h3>
             <p>Go beyond the name. Get detailed information on uses, side effects, warnings, and discover numerous brand alternatives available in your region.</p>
-        </div>
-    </a>
-    <a href="{{ url_for('kendra_finder_page') }}" class="feature-link">
-        <div class="feature-card">
+        </a>
+        
+        <a href="{{ url_for('kendra_finder_page') }}" class="feature-card">
             <div class="icon">📍</div>
             <h3>Jan Aushadi Kendra Finder</h3>
             <p>Quickly locate nearby Jan Aushadi Kendras to access affordable generic medicines. Our interactive map makes finding a store simple and intuitive.</p>
-        </div>
-    </a>
-    <a href="{{ url_for('ai_assistant_page') }}" class="feature-link">
-        <div class="feature-card">
+        </a>
+        
+        <a href="{{ url_for('ai_assistant_page') }}" class="feature-card">
             <div class="icon">💬</div>
             <h3>AI-Powered Medical Assistant</h3>
             <p>Have a question? Our empathetic AI assistant is available 24/7 to provide clear, understandable answers to your health and medication queries.</p>
-        </div>
-    </a>
-    <a href="{{ url_for('blog_page') }}" class="feature-link">
-        <div class="feature-card">
+        </a>
+        
+        <a href="{{ url_for('price_comparison_page') }}" class="feature-card">
+            <div class="icon">⚖️</div>
+            <h3>Price Comparison</h3>
+            <p>Compare prices of medicines from different online stores to find the most affordable options for your needs and discover alternative medications with the same ingredients.</p>
+        </a>
+        
+        <a href="{{ url_for('blog_page') }}" class="feature-card">
             <div class="icon">✍️</div>
             <h3>Health & Wellness Blog</h3>
             <p>Stay informed with our curated blog, featuring articles on health, wellness, and the latest in medical awareness.</p>
-        </div>
-    </a>
-    <a href="{{ url_for('price_comparison_page') }}" class="feature-link">
-        <div class="feature-card">
-            <div class="icon">⚖️</div>
-            <h3>Price Comparison</h3>
-            <p>Compare prices of medicines from different online stores to find the most affordable options for your needs.</p>
-        </div>
-    </a>
-    <a href="{{ url_for('saved_items_page') }}" class="feature-link">
-        <div class="feature-card">
+        </a>
+        
+        <a href="{{ url_for('saved_items_page') }}" class="feature-card">
             <div class="icon">❤️</div>
             <h3>Save for Future</h3>
             <p>Keep a personalized list of your important medications and health essentials for quick reference.</p>
-        </div>
-    </a>
-    <a href="{{ url_for('daily_essentials_page') }}" class="feature-link">
-        <div class="feature-card">
-            <div class="icon">🛒</div>
-            <h3>Daily Essentials</h3>
-            <p>Explore a range of daily health essentials and products to support your overall well-being.</p>
-        </div>
-    </a>
-</div>
+        </a>
+    </div>
+</section>
 
-<div class="benefits-section" style="padding: 4rem 2rem; background-color: #f8f9fa;">
-    <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem; color: #2c3e50;">Why Choose MedInfoAI?</h2>
-    <div class="features-section">
-        <div class="feature-card">
-            <div class="icon">💡</div>
-            <h3>Clarity in Complexity</h3>
-            <p>We translate complex medical jargon into simple, understandable language, empowering you to understand your health better.</p>
+<!-- Benefits Section -->
+<section class="benefits-section">
+    <div class="benefits-container">
+        <div class="section-title">
+            <h2>Why Choose MedInfoAI?</h2>
+            <p>Experience the advantages that set us apart</p>
         </div>
-        <div class="feature-card">
-            <div class="icon">🌍</div>
-            <h3>Localized for You</h3>
-            <p>Get information on brand alternatives and availability that is relevant to your region, making your search more effective.</p>
-        </div>
-        <div class="feature-card">
-            <div class="icon">🔒</div>
-            <h3>Trustworthy & Reliable</h3>
-            <p>Our information is sourced from reputable databases and verified to ensure you receive trustworthy and up-to-date medical information.</p>
+        
+        <div class="benefits-grid">
+            <div class="benefit-card">
+                <div class="icon">💡</div>
+                <h3>Clarity in Complexity</h3>
+                <p>We translate complex medical jargon into simple, understandable language, empowering you to understand your health better.</p>
+            </div>
+            
+            <div class="benefit-card">
+                <div class="icon">🌍</div>
+                <h3>Localized for You</h3>
+                <p>Get information on brand alternatives and availability that is relevant to your region, making your search more effective.</p>
+            </div>
+            
+            <div class="benefit-card">
+                <div class="icon">🔒</div>
+                <h3>Trustworthy & Reliable</h3>
+                <p>Our information is sourced from reputable databases and verified to ensure you receive trustworthy and up-to-date medical information.</p>
+            </div>
         </div>
     </div>
-</div>
+</section>
 
-<div class="how-it-works-section" style="padding: 4rem 2rem;">
-    <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem; color: #2c3e50;">How It Works</h2>
-    <div style="display: flex; justify-content: space-around; align-items: center; max-width: 1200px; margin: 0 auto; gap: 2rem;">
-        <div style="text-align: center; max-width: 300px;">
-            <div style="font-size: 3rem; color: #3498db; margin-bottom: 1rem;">1</div>
-            <h3 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 0.5rem;">Search Your Medication</h3>
-            <p style="color: #7f8c8d;">Enter the name of your medication to get started.</p>
+<!-- How It Works Section -->
+<section class="how-it-works-section">
+    <div class="section-title">
+        <h2>How It Works</h2>
+        <p>Simple steps to get the information you need</p>
+    </div>
+    
+    <div class="steps-container">
+        <div class="step">
+            <div class="step-number">1</div>
+            <h3>Search Your Medication</h3>
+            <p>Enter the name of your medication to get started.</p>
         </div>
-        <div style="font-size: 2rem; color: #bdc3c7;">&rarr;</div>
-        <div style="text-align: center; max-width: 300px;">
-            <div style="font-size: 3rem; color: #3498db; margin-bottom: 1rem;">2</div>
-            <h3 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 0.5rem;">View Detailed Information</h3>
-            <p style="color: #7f8c8d;">Access comprehensive details about its uses, side effects, and more.</p>
+        
+        <div class="step">
+            <div class="step-number">2</div>
+            <h3>View Detailed Information</h3>
+            <p>Access comprehensive details about its uses, side effects, and more.</p>
         </div>
-        <div style="font-size: 2rem; color: #bdc3c7;">&rarr;</div>
-        <div style="text-align: center; max-width: 300px;">
-            <div style="font-size: 3rem; color: #3498db; margin-bottom: 1rem;">3</div>
-            <h3 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 0.5rem;">Make Informed Decisions</h3>
-            <p style="color: #7f8c8d;">Use the insights to have confident conversations with your healthcare provider.</p>
+        
+        <div class="step">
+            <div class="step-number">3</div>
+            <h3>Make Informed Decisions</h3>
+            <p>Use the insights to have confident conversations with your healthcare provider.</p>
         </div>
     </div>
-</div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="cta-container">
+        <h2>Ready to Take Control of Your Health?</h2>
+        <p>Start using MedInfoAI today and experience the power of clear, reliable medical information at your fingertips.</p>
+        <a href="{{ url_for('ai_assistant_page') }}" class="cta-button-white">Get Started Now</a>
+    </div>
+</section>
 {% endblock %}

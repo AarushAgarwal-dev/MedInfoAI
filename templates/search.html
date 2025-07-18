@@ -2,13 +2,44 @@
 {% block title %}Medicine Search - MedInfo AI{% endblock %}
 
 {% block content %}
-<section id="medicine-search" class="section full-width-container" style="padding: 2rem 3rem; margin: 0; display: flex; flex-direction: column; height: 100%;">
-    <h2 style="text-align: center; margin-bottom: 2rem;">Find About Your Medicine (Subsitutes, Alternatives, Uses, Side Effects, etc.)</h2>
-    <form id="search-form" style="margin-bottom: 2rem;">
-        <input type="text" id="medicine-input" placeholder="e.g., Crocin, Combiflam, Telma 40" required>
-        <button type="submit">Search</button>
-    </form>
-    <div id="loader" class="loader" style="display: none;"></div>
-    <div id="results-container" style="flex-grow: 1; overflow-y: auto;"></div>
-</section>
+<div class="container">
+    <section id="medicine-search" class="section">
+        <br>
+        <h2 class="text-center">Find About Your Medicine</h2>
+        <p class="text-center mb-3 text-muted">Search for detailed information about medications, including substitutes, alternatives, uses, and side effects</p>
+        <form id="search-form">
+            <input type="text" id="medicine-input" placeholder="e.g., Crocin, Combiflam, Telma 40" required>
+            <button type="submit">Search</button>
+        </form>
+        <div id="loader" class="loader" style="display: none; margin: 2rem auto; text-align: center;">
+            <div class="spinner"></div>
+            <p style="margin-top: 1rem;">Searching for medication information...</p>
+        </div>
+        <div id="results-container"></div>
+    </section>
+</div>
+{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+    
+    #medicine-search {
+        min-height: 70vh;
+    }
+</style>
 {% endblock %} 

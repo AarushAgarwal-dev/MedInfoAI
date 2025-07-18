@@ -7,12 +7,232 @@
         /* Override for this page */
         background-color: #fff; /* Or any other desired background */
     }
+    
+    /* Full screen styles for AI assistant */
+    .ai-assistant-page {
+        height: calc(100vh - 64px); /* Subtract navbar height */
+        display: flex;
+        flex-direction: column;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+    }
+    
+    .ai-assistant-header {
+        padding: 1.5rem;
+        text-align: center;
+        background-color: #f8fafb;
+        border-bottom: 1px solid #e0e7e5;
+    }
+    
+    .ai-assistant-header h2 {
+        margin: 0;
+        color: #00796b;
+    }
+    
+    #ai-chat-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 0 1rem;
+    }
+    
+    #ai-chat-window {
+        flex: 1;
+        max-height: none !important;
+        border-radius: 0;
+        margin: 1rem 0;
+        user-select: none; /* Prevent text selection */
+        pointer-events: none; /* Prevent interactions */
+        overflow-y: auto; /* Keep scrolling ability */
+    }
+    
+    /* Make links still clickable */
+    #ai-chat-window a {
+        pointer-events: auto;
+    }
+    
+    .ai-chat-form {
+        padding: 1rem;
+        background-color: #f8fafb;
+        border-top: 1px solid #e0e7e5;
+        margin: 0;
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .ai-chat-form button {
+        padding: 12px 24px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        flex-shrink: 0;
+    }
+    
+    .ai-chat-form button:hover {
+        background-color: var(--primary-hover);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .ai-assistant-page {
+            height: calc(100vh - 120px); /* Adjust for mobile navbar */
+        }
+    }
+    
+    /* Add a blinking cursor effect to highlight the input field */
+    @keyframes blinkingCursor {
+        0% { border-color: var(--primary-color); }
+        50% { border-color: transparent; }
+        100% { border-color: var(--primary-color); }
+    }
+    
+    #ai-chat-input.focus-highlight {
+        animation: blinkingCursor 1s ease-in-out 3;
+        border: 2px solid var(--primary-color);
+        box-shadow: 0 0 8px rgba(0, 121, 107, 0.4);
+    }
+    
+    /* Make the input field more prominent */
+    #ai-chat-input {
+        flex-grow: 1;
+        padding: 12px 16px;
+        border: 2px solid var(--primary-color);
+        border-radius: 50px;
+        font-size: 1.1em;
+        transition: box-shadow var(--transition-fast);
+        box-shadow: 0 0 5px rgba(0, 121, 107, 0.3);
+        position: relative;
+        z-index: 100;
+        width: calc(100% - 120px); /* Adjust width to leave space for button */
+        margin-right: 10px;
+    }
+    
+    #ai-chat-input:focus {
+        outline: none;
+        box-shadow: 0 0 10px rgba(0, 121, 107, 0.5);
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<section id="ai-assistant" class="section full-width-container" style="padding: 2rem 3rem; margin: 0; display: flex; flex-direction: column; height: 100%;">
-    <h2 style="text-align: center; margin-bottom: 2rem;">Ask Our AI Medical Assistant</h2>
-    <div id="ai-chat-container" style="flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto;"></div>
+<section id="ai-assistant" class="section full-width-container ai-assistant-page">
+    <div class="ai-assistant-header">
+        <h2>Ask Our AI Medical Assistant</h2>
+    </div>
+    <div id="ai-chat-container"></div>
 </section>
+
+<script>
+// Override the createAIChatUI function to use our full-screen layout
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('ai-chat-container');
+    if (!container) return;
+    
+    container.innerHTML = `
+        <div class="ai-chat-window" id="ai-chat-window"></div>
+        <form id="ai-chat-form" class="ai-chat-form">
+            <input type="text" id="ai-chat-input" placeholder="Type your health or medication question..." autocomplete="off" required />
+            <button type="submit">Send</button>
+        </form>
+    `;
+    
+    const chatWindow = document.getElementById('ai-chat-window');
+    const chatForm = document.getElementById('ai-chat-form');
+    const chatInput = document.getElementById('ai-chat-input');
+    let isLoading = false;
+    const converter = new showdown.Converter({
+        simplifiedAutoLink: true,
+        strikethrough: true,
+        tables: true
+    });
+
+    // Add welcome message
+    appendMessage('ai', 'Hello! I\'m your AI Medical Assistant. How can I help you with your health or medication questions today?');
+    
+    // Focus input after a slight delay to ensure the DOM is fully rendered
+    setTimeout(() => {
+        chatInput.focus();
+        chatInput.click(); // This helps on some mobile browsers
+    }, 100);
+
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const userMsg = chatInput.value.trim();
+        if (!userMsg || isLoading) return;
+        appendMessage('user', userMsg);
+        chatInput.value = '';
+        chatInput.disabled = true;
+        isLoading = true;
+        appendMessage('ai', '<span class="ai-loading">Thinking...</span>');
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        try {
+            const res = await fetch('/ai-assistant', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: userMsg })
+            });
+            const data = await res.json();
+            const aiReply = data.reply || 'Sorry, I could not process your request.';
+            const htmlReply = converter.makeHtml(aiReply);
+            replaceLastAIMessage(htmlReply);
+        } catch (err) {
+            replaceLastAIMessage('Sorry, there was an error contacting the AI.');
+        } finally {
+            chatInput.disabled = false;
+            setTimeout(() => chatInput.focus(), 10); // Slight delay helps with focus
+            isLoading = false;
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+    });
+
+    function appendMessage(sender, text) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'ai-chat-msg ' + (sender === 'user' ? 'user-msg' : 'ai-msg');
+        if (sender === 'user') {
+            msgDiv.textContent = text;
+        } else {
+            msgDiv.innerHTML = text;
+        }
+        chatWindow.appendChild(msgDiv);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+    
+    function replaceLastAIMessage(html) {
+        const msgs = chatWindow.querySelectorAll('.ai-msg');
+        if (msgs.length > 0) {
+            msgs[msgs.length - 1].innerHTML = html;
+        }
+        setTimeout(() => chatInput.focus(), 10);
+    }
+    
+    // Make the entire page clickable to focus the input
+    document.body.addEventListener('click', function(e) {
+        // Don't interfere with actual link clicks
+        if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
+            chatInput.focus();
+        }
+    });
+    
+    // Also focus when the window gains focus
+    window.addEventListener('focus', function() {
+        setTimeout(() => chatInput.focus(), 10);
+    });
+    
+    // Set an interval to check focus
+    setInterval(() => {
+        if (document.activeElement !== chatInput && !isLoading) {
+            chatInput.focus();
+        }
+    }, 1000);
+});
+</script>
 {% endblock %} 

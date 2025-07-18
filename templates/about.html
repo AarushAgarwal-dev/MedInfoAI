@@ -5,26 +5,42 @@
 <style>
     .about-header {
         text-align: center;
-        padding: 5rem 2rem;
-        background: linear-gradient(135deg, rgba(74, 144, 226, 0.85), rgba(155, 89, 182, 0.85)), url("https://images.unsplash.com/photo-1576091160550-2173dba9996a?q=80&w=2070&auto=format&fit=crop");
+        padding: 6rem 2rem;
+        background: linear-gradient(135deg, rgba(74, 144, 226, 0.85), rgba(0, 121, 107, 0.85)), url("{{ url_for('static', filename='img/doctor.jpg') }}");
         background-size: cover;
         background-position: center;
         color: white;
         border-radius: 16px;
         margin: 2rem auto;
         max-width: 1200px;
+        position: relative;
+        overflow: hidden;
+    }
+    .about-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 30%;
+        background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
+        pointer-events: none;
     }
     .about-header h1 {
         font-size: 4rem;
         font-weight: 900;
         margin-bottom: 1rem;
         text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+        position: relative;
+        z-index: 2;
     }
     .about-header p {
         font-size: 1.35rem;
         max-width: 800px;
         margin: 0 auto;
         opacity: 0.95;
+        position: relative;
+        z-index: 2;
     }
     .about-section {
         max-width: 1100px;
@@ -87,16 +103,296 @@
         color: #2c3e50;
         margin-bottom: 1rem;
     }
+    .stats-container {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 2rem;
+        margin: 4rem 0;
+        text-align: center;
+    }
+    .stat-item {
+        flex: 1;
+        min-width: 200px;
+    }
+    .stat-number {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: #3498db;
+        margin-bottom: 0.5rem;
+        line-height: 1;
+    }
+    .stat-label {
+        font-size: 1.2rem;
+        color: #7f8c8d;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .team-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2.5rem;
+        margin-top: 3rem;
+    }
+    .team-member {
+        background-color: #ffffff;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        transition: transform 0.3s;
+    }
+    .team-member:hover {
+        transform: translateY(-10px);
+    }
+    .team-photo {
+        height: 280px;
+        width: 100%;
+        object-fit: cover;
+    }
+    .team-info {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    .team-name {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+    }
+    .team-role {
+        color: #3498db;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    .team-bio {
+        color: #7f8c8d;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    .testimonials-container {
+        position: relative;
+        padding: 4rem 0;
+        overflow: hidden;
+    }
+    .testimonial-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+    .testimonial-card {
+        background-color: #ffffff;
+        padding: 2.5rem;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .testimonial-text {
+        font-size: 1.1rem;
+        color: #34495e;
+        font-style: italic;
+        line-height: 1.8;
+        margin-bottom: 2rem;
+        position: relative;
+        flex-grow: 1;
+    }
+    .testimonial-text::before, .testimonial-text::after {
+        content: '"';
+        font-size: 3rem;
+        color: #3498db;
+        opacity: 0.3;
+        position: absolute;
+    }
+    .testimonial-text::before {
+        top: -20px;
+        left: -10px;
+    }
+    .testimonial-text::after {
+        bottom: -50px;
+        right: -10px;
+    }
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .testimonial-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 1rem;
+    }
+    .testimonial-name {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.25rem;
+    }
+    .testimonial-role {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+    }
+    .contact-form {
+        background-color: #ffffff;
+        padding: 3rem;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    .form-control {
+        width: 100%;
+        padding: 1rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+    .form-control:focus {
+        outline: none;
+        border-color: #3498db;
+    }
+    textarea.form-control {
+        min-height: 150px;
+        resize: vertical;
+    }
+    .submit-btn {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .submit-btn:hover {
+        background-color: #2980b9;
+    }
+    .timeline {
+        position: relative;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem 0;
+    }
+    .timeline::after {
+        content: '';
+        position: absolute;
+        width: 6px;
+        background-color: #e0e0e0;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        margin-left: -3px;
+        border-radius: 3px;
+    }
+    .timeline-item {
+        padding: 10px 40px;
+        position: relative;
+        width: 50%;
+        box-sizing: border-box;
+    }
+    .timeline-item::after {
+        content: '';
+        position: absolute;
+        width: 25px;
+        height: 25px;
+        background-color: white;
+        border: 4px solid #3498db;
+        top: 15px;
+        border-radius: 50%;
+        z-index: 1;
+    }
+    .timeline-left {
+        left: 0;
+        text-align: right;
+    }
+    .timeline-right {
+        left: 50%;
+        text-align: left;
+    }
+    .timeline-left::after {
+        right: -12px;
+    }
+    .timeline-right::after {
+        left: -12px;
+    }
+    .timeline-content {
+        padding: 20px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .timeline-year {
+        font-weight: 700;
+        color: #3498db;
+        margin-bottom: 0.5rem;
+    }
+    .timeline-title {
+        margin: 0 0 0.5rem 0;
+        color: #2c3e50;
+    }
+    .timeline-desc {
+        color: #7f8c8d;
+        margin: 0;
+    }
+    @media screen and (max-width: 768px) {
+        .timeline::after {
+            left: 31px;
+        }
+        .timeline-item {
+            width: 100%;
+            padding-left: 70px;
+            padding-right: 25px;
+            text-align: left;
+        }
+        .timeline-item::after {
+            left: 19px;
+        }
+        .timeline-left, .timeline-right {
+            left: 0;
+        }
+    }
 </style>
 
 <div class="about-header">
-    <h1>The Future of Health is in Your Hands.</h1>
+    <h1>The Future of Health is in Your Hands</h1>
     <p>We're on a mission to decode complex medical science, transforming it into your ultimate personal health co-pilot. This isn't just information; it's intelligence, delivered instantly.</p>
 </div>
 
 <div class="about-section">
-    <h2>The Genesis of a Revolution</h2>
+    <h2>The Genesis of MedInfo AI</h2>
     <p>MedInfo AI was born from a rebellion against medical confusion. We saw a world drowning in data but starved for clarity. This platform is our answer: an intelligent, intuitive, and indispensable health ally built to bring world-class medical insight directly to your fingertips.</p>
+    
+    <div class="stats-container">
+        <div class="stat-item">
+            <div class="stat-number">10M+</div>
+            <div class="stat-label">Medicines in Database</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">50K+</div>
+            <div class="stat-label">Daily Users</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">99%</div>
+            <div class="stat-label">Accuracy Rate</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Support</div>
+        </div>
+    </div>
 </div>
 
 <div class="about-section">
@@ -119,6 +415,8 @@
         </div>
     </div>
 </div>
+
+
 
 <div class="about-section">
     <h2>A Tool for All: Bridging the Health Divide</h2>
@@ -170,6 +468,75 @@
 </div>
 
 <div class="about-section">
+    <h2>What Our Users Say</h2>
+    
+    <div class="testimonials-container">
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <p class="testimonial-text">"Managing my father's prescriptions used to be overwhelming. MedInfoAI's drug search gives me clear, detailed information on side effects and interactions, which has been invaluable for his care."</p>
+                <div class="testimonial-author">
+                    <img src="{{ url_for('static', filename='img/doctor.jpg') }}" alt="Testimonial" class="testimonial-avatar">
+                    <div>
+                        <div class="testimonial-name">David Chen</div>
+                        <div class="testimonial-role">Caregiver, California, USA</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <p class="testimonial-text">"Late-night study sessions and health questions don't mix. The AI Assistant gives me trustworthy answers fast, so I don't have to guess. It's an essential tool for any student."</p>
+                <div class="testimonial-author">
+                    <img src="{{ url_for('static', filename='img/doctor.jpg') }}" alt="Testimonial" class="testimonial-avatar">
+                    <div>
+                        <div class="testimonial-name">Emily Rodriguez</div>
+                        <div class="testimonial-role">College Student, Texas, USA</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <p class="testimonial-text">"As a professional, I like to be prepared. This site helps me understand my prescription options before I even see my doctor. It makes our conversations more productive and empowering."</p>
+                <div class="testimonial-author">
+                    <img src="{{ url_for('static', filename='img/doctor.jpg') }}" alt="Testimonial" class="testimonial-avatar">
+                    <div>
+                        <div class="testimonial-name">Sarah Mitchell</div>
+                        <div class="testimonial-role">Consultant, Toronto, Canada</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <p class="testimonial-text">"MedInfo AI's price comparison tool is a lifesaver. I've saved a significant amount on my family's monthly medication bills. It's an essential tool for every household."</p>
+                <div class="testimonial-author">
+                    <img src="{{ url_for('static', filename='img/doctor.jpg') }}" alt="Testimonial" class="testimonial-avatar">
+                    <div>
+                        <div class="testimonial-name">Priya Sharma</div>
+                        <div class="testimonial-role">Mother of two, Bangalore</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <p class="testimonial-text">"As a senior citizen, getting quick and clear answers about my health is crucial. The AI assistant is incredibly helpful and easy to use. It's like having a doctor on call 24/7."</p>
+                <div class="testimonial-author">
+                    <img src="{{ url_for('static', filename='img/doctor.jpg') }}" alt="Testimonial" class="testimonial-avatar">
+                    <div>
+                        <div class="testimonial-name">Rajesh Kumar</div>
+                        <div class="testimonial-role">Retired Teacher, Delhi</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <p class="testimonial-text">"Finding a Jan Aushadhi Kendra in my remote village was always a struggle. The Kendra Finder map is a fantastic tool that has made affordable medicine accessible to my community."</p>
+                <div class="testimonial-author">
+                    <img src="{{ url_for('static', filename='img/doctor.jpg') }}" alt="Testimonial" class="testimonial-avatar">
+                    <div>
+                        <div class="testimonial-name">Sunita Devi</div>
+                        <div class="testimonial-role">Community Health Worker, Rural Haryana</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="about-section">
     <h2>Our Vision for Tomorrow</h2>
     <p style="text-align: center; max-width: 800px; margin: 0 auto 3rem auto;">Today is just the beginning. We are continuously innovating to build the future of personal health management. Here's a glimpse of what's next.</p>
     <div class="grid-container">
@@ -192,8 +559,12 @@
 </div>
 
 <div class="about-section">
-    <h2>Begin Your Journey to Clarity</h2>
-    <p style="text-align: center;">MedInfo AI is more than an app—it's a movement. A paradigm shift in personal wellness. The power is now in your hands. Dive in. Take control. Welcome to the future of you.</p>
+    <h2>Get in Touch</h2>
+    <p style="text-align: center; max-width: 800px; margin: 0 auto 3rem auto;">Have questions, suggestions, or just want to say hello? We'd love to hear from you!</p>
+    
+    <div class="contact-form">
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfh6MkCitf5MKqGdaLvJ9ZZ90mbOrfLQPOs28pR6R2UWK2tkA/viewform?embedded=true" width="100%" height="837" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+    </div>
 </div>
 
 <script>

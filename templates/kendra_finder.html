@@ -46,7 +46,21 @@
                 <h3>All Jan Aushadhi Kendras</h3>
                 <span id="kendras-count" class="kendras-count">0 kendras found</span>
             </div>
-            <div id="kendra-grid"></div>
+            <div id="kendra-table-container">
+                <table id="kendra-table" class="kendra-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>City</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="kendra-table-body">
+                        <!-- Kendra data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </section>
@@ -90,6 +104,37 @@
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 1.5rem;
+    }
+
+    .kendra-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1.5rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .kendra-table th, .kendra-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .kendra-table thead {
+        background-color: #f8fafb;
+    }
+
+    .kendra-table th {
+        font-weight: 600;
+        color: var(--text-color);
+    }
+
+    .kendra-table tbody tr {
+        cursor: pointer;
+        transition: background-color var(--transition-fast);
+    }
+
+    .kendra-table tbody tr:hover {
+        background-color: #f1f5f9;
     }
     
     .filter-options {
@@ -160,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const locationStatus = document.getElementById('location-status');
     const nearestKendraInfo = document.getElementById('nearest-kendra-info');
     const nearestKendraDetails = document.getElementById('nearest-kendra-details');
-    const kendraGrid = document.getElementById('kendra-grid');
+    const tableBody = document.getElementById('kendra-table-body');
     const cityFilter = document.getElementById('city-filter');
     const kendrasCount = document.getElementById('kendras-count');
     
@@ -262,24 +307,31 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Display kendras on map and in list
     function displayKendras(kendras) {
-        // Clear existing markers
-        clearMarkers();
+        tableBody.innerHTML = ''; // Clear existing rows
         
-        // Add new markers
         kendras.forEach(kendra => {
-            const marker = L.marker([kendra.lat, kendra.lng]).addTo(map);
-            marker.bindPopup(createPopupContent(kendra));
-            markers.push(marker);
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${kendra.name}</td>
+                <td>${kendra.address}</td>
+                <td>${kendra.city}</td>
+                <td><a href="https://maps.google.com/maps?q=${kendra.lat},${kendra.lng}" target="_blank" class="btn btn-sm btn-primary">View in Maps</a></td>
+            `;
+            
+            row.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'A') {
+                    map.setView([kendra.lat, kendra.lng], 15);
+                    const marker = markers.find(m => m.getLatLng().lat === kendra.lat && m.getLatLng().lng === kendra.lng);
+                    if (marker) {
+                        marker.openPopup();
+                    }
+                }
+            });
+            
+            tableBody.appendChild(row);
         });
         
-        // Update kendra grid
-        updateKendraGrid(kendras);
-        
-        // Fit map bounds to show all markers
-        if (kendras.length > 0 && !currentLocationMarker) {
-            const bounds = L.latLngBounds(kendras.map(k => [k.lat, k.lng]));
-            map.fitBounds(bounds, { padding: [50, 50] });
-        }
+        updateKendrasCount();
     }
     
     // Create popup content for marker
@@ -298,35 +350,6 @@ document.addEventListener('DOMContentLoaded', function() {
         content += `<p><a href="https://maps.google.com/maps?q=${kendra.lat},${kendra.lng}" target="_blank" class="btn btn-sm">Open in Google Maps</a></p>`;
         content += `</div>`;
         return content;
-    }
-    
-    // Update kendra grid with list of kendras
-    function updateKendraGrid(kendras) {
-        kendraGrid.innerHTML = '';
-        
-        kendras.forEach(kendra => {
-            const kendraCard = document.createElement('div');
-            kendraCard.className = 'kendra-card';
-            kendraCard.innerHTML = `
-                <h4>${kendra.name}</h4>
-                <div class="kendra-address">${kendra.address}</div>
-                <div class="kendra-city">${kendra.city}</div>
-                ${kendra.distance ? `<div class="kendra-distance"><strong>Distance:</strong> ${kendra.distance} km</div>` : ''}
-                <div class="kendra-actions" style="margin-top: 0.8rem;">
-                    <a href="https://maps.google.com/maps?q=${kendra.lat},${kendra.lng}" target="_blank" class="btn btn-sm">View in Maps</a>
-                </div>
-            `;
-            
-            kendraCard.addEventListener('click', () => {
-                map.setView([kendra.lat, kendra.lng], 15);
-                const marker = markers.find(m => m.getLatLng().lat === kendra.lat && m.getLatLng().lng === kendra.lng);
-                if (marker) {
-                    marker.openPopup();
-                }
-            });
-            
-            kendraGrid.appendChild(kendraCard);
-        });
     }
     
     // Clear all markers from the map

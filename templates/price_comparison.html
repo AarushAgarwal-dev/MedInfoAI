@@ -516,19 +516,29 @@ document.getElementById('search-alt-btn').addEventListener('click', async () => 
 
         loader.style.display = 'none';
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'An unknown error occurred.');
+        // Get response as text first to check for valid JSON
+        const responseText = await response.text();
+        let data;
+        
+        try {
+            data = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error("Failed to parse response as JSON:", parseError);
+            console.error("Response text:", responseText);
+            throw new Error("Server returned an invalid response. Please try again later.");
         }
 
-        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error || 'An unknown error occurred.');
+        }
+
         resultsContainer.style.display = 'block';
         
         // Display original medicine info
         let html = `<div class="original-medicine">
                         <div class="medicine-header">
                             ${data.original_medicine.image_url ? 
-                              `<img src="${data.original_medicine.image_url}" class="medicine-image" alt="${data.original_medicine.name}">` : 
+                              `<img src="${data.original_medicine.image_url}" class="medicine-image" alt="${data.original_medicine.name}" onerror="this.onerror=null; this.src=''; this.style.display='none';">` : 
                               `<div class="medicine-image" style="display: flex; align-items: center; justify-content: center; background-color: #f5f5f5;">
                                 <span style="font-size: 24px; color: #aaa;">Rx</span>
                               </div>`}
@@ -581,7 +591,23 @@ document.getElementById('search-alt-btn').addEventListener('click', async () => 
     } catch (error) {
         loader.style.display = 'none';
         resultsContainer.style.display = 'block';
-        resultsContainer.innerHTML = `<p>Error: ${error.message}</p>`;
+        
+        // Create a more user-friendly error display
+        resultsContainer.innerHTML = `
+            <div class="error-message" style="text-align: center; padding: 20px; background-color: #fff0f0; border-left: 4px solid #e74c3c; border-radius: 8px;">
+                <h3 style="color: #e74c3c; margin-top: 0;">Error</h3>
+                <p>${error.message}</p>
+                <div style="margin-top: 15px;">
+                    <p>Suggestions:</p>
+                    <ul style="text-align: left; max-width: 500px; margin: 0 auto;">
+                        <li>Check if the medicine name is spelled correctly</li>
+                        <li>Try a different medicine name</li>
+                        <li>Wait a few moments and try again</li>
+                    </ul>
+                </div>
+            </div>`;
+        
+        console.error("Alternative medicine search error:", error);
     }
 });
 

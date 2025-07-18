@@ -65,40 +65,51 @@ function displayResults(data, userQuery) {
     </div>`;
     resultsHtml += `
         <div class="tabs">
-            <button class="tab-button active" data-tab="tab-generic-info">About</button>
-            <button class="tab-button" data-tab="tab-alternatives">Alternatives</button>
-            <button class="tab-button" data-tab="tab-uses">Uses</button>
-            <button class="tab-button" data-tab="tab-side-effects">Side Effects</button>
-            <button class="tab-button" data-tab="tab-warnings">Warnings</button>
+            <button class="tab-button active" data-tab="tab-generic-info"><i class="fas fa-info-circle"></i> About</button>
+            <button class="tab-button" data-tab="tab-alternatives"><i class="fas fa-exchange-alt"></i> Alternatives</button>
+            <button class="tab-button" data-tab="tab-uses"><i class="fas fa-pills"></i> Uses</button>
+            <button class="tab-button" data-tab="tab-side-effects"><i class="fas fa-exclamation-triangle"></i> Side Effects</button>
+            <button class="tab-button" data-tab="tab-warnings"><i class="fas fa-exclamation-circle"></i> Warnings</button>
         </div>
     `;
-    const createList = (items) => (items && items.length > 0) ? `<ul>${items.filter(i => i).map(item => `<li>${item}</li>`).join('')}</ul>` : '<p>No specific information was found in the search results.</p>';
-    resultsHtml += `<div id="tab-generic-info" class="tab-content active">${data.generic_info_paragraph ? `<p class="generic-info-paragraph">${data.generic_info_paragraph}</p>` : createList([])}</div>`;
+    const createList = (items) => {
+        if (!items || items.length === 0) {
+            return '<p class="no-info">No specific information was found for this section.</p>';
+        }
+        return `<ul>${items.filter(i => i).map(item => `<li>${item}</li>`).join('')}</ul>`;
+    };
+
+    const genericInfo = data.generic_info_paragraph ? `<p class="generic-info-paragraph">${data.generic_info_paragraph}</p>` : '<p class="no-info">No detailed information available.</p>';
+    resultsHtml += `<div id="tab-generic-info" class="tab-content active">${genericInfo}</div>`;
     resultsHtml += `<div id="tab-uses" class="tab-content">${createList(data.summary?.uses)}</div>`;
     resultsHtml += `<div id="tab-side-effects" class="tab-content">${createList(data.summary?.side_effects)}</div>`;
     resultsHtml += `<div id="tab-warnings" class="tab-content">${createList(data.summary?.warnings)}</div>`;
     resultsHtml += `<div id="tab-alternatives" class="tab-content">`;
+
     if (data.alternatives && data.alternatives.length > 0) {
         const originalDrugName = (data.identified_medicine || userQuery).toLowerCase();
         const filteredAlternatives = data.alternatives.filter(alt => alt && alt.brand_name && alt.brand_name.toLowerCase() !== originalDrugName);
         if (filteredAlternatives.length > 0) {
             resultsHtml += `<div class="alternatives-grid">`;
             filteredAlternatives.forEach(alt => {
+                const confidenceClass = alt.match_confidence === "Exact Match" ? "exact-match" : "potential-match";
                 resultsHtml += `
                     <div class="alternative-card">
                         <h4>${alt.brand_name}</h4>
-                        <p class="manufacturer">by ${alt.manufacturer}</p>
+                        <p class="manufacturer">by ${alt.manufacturer || 'Unknown'}</p>
+                        <div class="confidence ${confidenceClass}">
+                            <span>${alt.match_confidence}</span>
+                        </div>
                     </div>`;
             });
             resultsHtml += `</div>`;
         } else {
-             resultsHtml += `<p>No other brand alternatives were found.</p>`;
+             resultsHtml += `<p class="no-info">No other brand alternatives were found with the same composition.</p>`;
         }
     } else {
-        resultsHtml += `<p>No brand alternatives were found.</p>`;
+        resultsHtml += `<p class="no-info">No brand alternatives were found.</p>`;
     }
-    resultsHtml += `</div>`;
-    resultsHtml += `</div>`;
+    resultsHtml += `</div></div>`;
     resultsContainer.innerHTML = resultsHtml;
     addTabListeners();
 }

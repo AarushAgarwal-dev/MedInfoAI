@@ -103,7 +103,10 @@ def process_with_groq(system_prompt, user_prompt):
     """
     A generic function to call the Groq AI with specified prompts.
     """
-    if not groq_client: raise ConnectionError("Groq client not initialized.")
+    if not groq_client: 
+        print("Groq client not initialized.")
+        return {"error": "AI service is not available."}
+        
     try:
         completion = groq_client.chat.completions.create(
             model="llama3-70b-8192",
@@ -114,7 +117,14 @@ def process_with_groq(system_prompt, user_prompt):
             ]
         )
         response_text = completion.choices[0].message.content
-        return json.loads(response_text)
+        
+        try:
+            # Ensure we get valid JSON
+            return json.loads(response_text)
+        except json.JSONDecodeError as json_err:
+            print(f"JSON parsing error: {json_err}. Response text: {response_text[:200]}...")
+            return {"error": "Failed to parse AI response as JSON."}
+            
     except Exception as e:
         print(f"Groq API Error: {e}")
         return {"error": "The AI service encountered an error during processing."}
@@ -330,7 +340,7 @@ def price_comparison():
         # Enhanced prompt for price extraction with additional information
         system_prompt = """
         You are a pharmaceutical price extraction expert. From the provided web search results (a JSON list with title, snippet, and link), extract detailed price listings for the requested medication.
-        
+
         CRITICAL INSTRUCTIONS:
         1. Analyze the 'snippet' and 'title' for price and store information
         2. For each listing, extract:
@@ -385,7 +395,7 @@ def price_comparison():
         
         print(f"--- Analyzing price data for '{medicine_name}' ---")
         price_data = process_with_groq(system_prompt, user_prompt)
-        
+
         # Extract and enhance the response
         prices = price_data.get('prices', [])
         medicine_info = price_data.get('medicine_info', {})
@@ -445,83 +455,111 @@ def search():
         if not composition_context_list:
             return jsonify({'error': "Could not find any composition information for this drug via web search."}), 404
         
-        # Convert list of results to a single string of snippets for the AI
         composition_context_str = " ".join([item.get('snippet', '') for item in composition_context_list])
 
         stage1_system_prompt = """
         From the user query and web context, your only job is to identify the drug's exact chemical composition.
-        Output a single, raw JSON object with one key, 'composition'.
+        Output a single, raw JSON object with one key, 'composition'. If no clear composition is found, respond with {"composition": null}.
         Example: { "composition": "Paracetamol 500mg" }
         """
         composition_result = process_with_groq(stage1_system_prompt, f"CONTEXT: {composition_context_str}\nUSER QUERY: {user_query}")
         
+        if isinstance(composition_result, dict) and 'error' in composition_result:
+            return jsonify({'error': composition_result['error']}), 500
+            
         composition = composition_result.get("composition")
         if not composition:
             return jsonify({'error': "AI could not determine the drug's composition from the search results."}), 404
         
         generic_name = composition.split(' ')[0]
 
-        # --- STAGE 2: Massive Information Gathering ---
+        # --- STAGE 2: Massive Information Gathering (Updated) ---
         print(f"\n--- STAGE 2: Building Super-Context for '{composition}' ---")
-        queries = {
-            "uses": f'"{composition}" detailed uses and indications',
-            "side_effects": f'"{composition}" common and rare side effects professional',
-            "warnings": f'"{composition}" contraindications and warnings',
-            "alternatives": f'"{composition}" brand names and manufacturers in india',
-            "generic_info": f'what is "{generic_name}" medicine class and mechanism of action'
+
+        # Define standard queries
+        search_queries = {
+            "uses": (f'"{composition}" detailed uses and indications', 10),
+            "side_effects": (f'"{composition}" common and rare side effects professional', 10),
+            "warnings": (f'"{composition}" contraindications and warnings official prescribing information', 10),
+            "generic_info": (f'what is "{generic_name}" medicine class and mechanism of action', 5)
         }
-        
+
+        # More diverse and robust queries for alternatives
+        alternative_queries = [
+            (f'"{composition}" brand names and manufacturers in india', 15),
+            (f'substitutes for "{user_query}" with same composition "{composition}"', 10),
+            (f'"{generic_name}" equivalent brands and prices', 10),
+            (f'"{composition}" alternative brand names', 15)
+        ]
+
+        # Combine all queries
+        all_queries = list(search_queries.items())
+        for query_tuple in alternative_queries:
+            all_queries.append(("alternatives", query_tuple))
+
+        # Perform all searches and build the super_context
         super_context = ""
-        for key, query in queries.items():
+        for key, query_info in all_queries:
+            query, num_results = query_info
             super_context += f"\n\n--- CONTEXT FOR {key.upper()} ---\n"
-            search_result_list, error = perform_google_search(query, GOOGLE_API_KEY, GOOGLE_CSE_ID)
-            if error:
-                 print(f"ERROR during super-context search for '{key}': {error}")
-                 return jsonify({'error': f"A search error occurred while gathering details for '{key}'. Details: {error}"}), 500
             
-            if search_result_list:
-                # Convert list of results to a single string of snippets
+            search_result_list, error = perform_google_search(query, GOOGLE_API_KEY, GOOGLE_CSE_ID, num_results=num_results)
+            
+            if error:
+                print(f"ERROR during super-context search for '{key}': {error}")
+                super_context += "No information found for this section.\n"
+            elif search_result_list:
                 search_result_str = " ".join([item.get('snippet', '') for item in search_result_list])
                 super_context += search_result_str
+            else:
+                super_context += "No information found for this section.\n"
 
-        # --- STAGE 3: Final, Comprehensive Synthesis ---
-        print("\n--- STAGE 3: Final AI Synthesis ---")
+        # --- STAGE 3: Final, Comprehensive Synthesis (Updated Prompt) ---
         stage3_system_prompt = """
-        You are a Drug Information Synthesizer. Your job is to meticulously analyze the provided, pre-categorized web search contexts and create a single, comprehensive JSON report.
+        You are a Drug Information Synthesizer. Your job is to meticulously analyze the provided web search contexts and create a single, comprehensive JSON report.
 
         CRITICAL RULES:
-        - For each section (uses, side_effects, etc.), create a long, detailed, and thorough bulleted list based ONLY on its corresponding context.
-        - For 'alternatives', create a list of objects, each containing the 'brand_name' and 'manufacturer'. If a manufacturer is not clearly associated with a brand, omit that brand. Find as many as you can.
-        - For 'generic_info_paragraph', write a detailed, professional summary of the drug's class and how it works, based on its context.
-        - The output must be a single, raw JSON object.
+        - You MUST output a single, raw, and valid JSON object.
+        - ALWAYS include ALL the keys specified in the structure, even if no information is found. Use empty arrays `[]` or empty strings `""` for missing data.
+        - For `uses`, `side_effects`, and `warnings`, create a detailed bulleted list based ONLY on the context. If no info, return an empty array.
+        - For `alternatives`, find and list AS MANY brand alternatives as possible from the context. Create a list of objects, where each must have `brand_name` and `manufacturer`. Also add a `match_confidence` field.
+        - `match_confidence` MUST be one of: "Exact Match" (if context confirms identical active ingredients) or "Potential Match" (if context is suggestive but not definitive).
+        - For `generic_info_paragraph`, write a professional summary. If no info, return an empty string.
 
         JSON OUTPUT STRUCTURE:
         {
           "generic_info_paragraph": "A detailed paragraph about the generic drug.",
           "summary": {
-              "uses": ["A long, detailed list of key uses."],
-              "side_effects": ["A long, detailed list of common and rare side effects."],
-              "warnings": ["A long, detailed list of important warnings."]
+              "uses": ["List of key uses."],
+              "side_effects": ["List of common and rare side effects."],
+              "warnings": ["List of important warnings."]
           },
           "alternatives": [
-            { "brand_name": "Brand Name 1", "manufacturer": "Manufacturer 1" },
-            { "brand_name": "Brand Name 2", "manufacturer": "Manufacturer 2" }
+            { "brand_name": "Brand Name 1", "manufacturer": "Manufacturer 1", "match_confidence": "Exact Match" }
           ]
         }
         """
+        
         final_summary = process_with_groq(stage3_system_prompt, f"CONTEXTS:\n{super_context}\n\nUSER QUERY: Create a full report for a drug with composition: {composition}")
 
-        # --- STAGE 4: Assemble the Final Response ---
+        if isinstance(final_summary, dict) and 'error' in final_summary:
+            return jsonify({'error': final_summary['error']}), 500
+        if not isinstance(final_summary, dict):
+            return jsonify({'error': "AI returned an invalid data format."}), 500
+
+        # --- STAGE 4: Assemble and Validate the Final Response ---
         print("\n--- STAGE 4: Assembling Final Response ---")
         final_response = {
             "identified_medicine": user_query.title(),
             "composition": composition,
             "generic_name": generic_name,
             "image_url": get_medicine_image_url(user_query, GOOGLE_API_KEY, GOOGLE_CSE_ID),
-            **final_summary
+            "generic_info_paragraph": final_summary.get("generic_info_paragraph", ""),
+            "summary": final_summary.get("summary", {"uses": [], "side_effects": [], "warnings": []}),
+            "alternatives": final_summary.get("alternatives", [])
         }
 
-        print(f"✅ Final report generated with {len(final_response.get('alternatives', []))} unique alternatives.")
+        print(f"✅ Final report generated with {len(final_response.get('alternatives', []))} alternatives.")
         return jsonify(final_response)
 
     except Exception as e:
@@ -611,6 +649,11 @@ def alternative_medicine_price():
         """
         
         composition_data = process_with_groq(composition_prompt, f"CONTEXT: {composition_context}\nMEDICINE NAME: {medicine_name}")
+        
+        # Check for error in AI response
+        if "error" in composition_data:
+            return jsonify({'error': composition_data["error"]}), 500
+            
         active_ingredients = composition_data.get('active_ingredients', [])
         
         if not active_ingredients:
@@ -652,6 +695,7 @@ def alternative_medicine_price():
         4. Include at least 5 alternatives if possible, but only if they truly match the active ingredients
         5. For each alternative, include a confidence score (0-100%) indicating how certain you are that it contains the exact same ingredients
         6. If a medicine appears to be the same as the original (same brand, different packaging), exclude it
+        7. If no alternatives are found, return an empty array for "alternatives"
         
         Return a JSON with an "alternatives" key containing a list of alternative medicine objects:
         
@@ -671,6 +715,10 @@ def alternative_medicine_price():
         
         alternatives_data = process_with_groq(alternatives_prompt, f"SEARCH RESULTS: {alternative_context}\nORIGINAL MEDICINE: {medicine_name}\nACTIVE INGREDIENTS: {', '.join(active_ingredients)}")
         
+        # Check for error in AI response
+        if "error" in alternatives_data:
+            return jsonify({'error': alternatives_data["error"]}), 500
+            
         # Filter alternatives by confidence score
         alternatives = alternatives_data.get('alternatives', [])
         alternatives = [alt for alt in alternatives if alt.get('confidence', 0) >= 70]
@@ -689,6 +737,7 @@ def alternative_medicine_price():
             if not error and results:
                 original_price_context += json.dumps(results)
         
+        original_price = 'Price not available'
         if original_price_context:
             original_price_prompt = f"""
             Extract the most accurate price information for "{medicine_name}" from the search results provided.
@@ -703,9 +752,10 @@ def alternative_medicine_price():
             Example: {{ "price": "₹50 for 10 tablets" }}
             """
             original_price_data = process_with_groq(original_price_prompt, f"SEARCH RESULTS: {original_price_context}")
-            original_price = original_price_data.get('price', 'Price not available')
-        else:
-            original_price = 'Price not available'
+            
+            # Check for error in AI response
+            if "error" not in original_price_data:
+                original_price = original_price_data.get('price', 'Price not available')
         
         # Get additional information about the original medicine
         print(f"\n--- STAGE 4: Getting additional information for '{medicine_name}' ---")
@@ -724,7 +774,11 @@ def alternative_medicine_price():
             
             Example: {{ "category": "Analgesic", "primary_use": "Pain relief and fever reduction" }}
             """
-            medicine_info = process_with_groq(info_prompt, f"CONTEXT: {info_context}")
+            medicine_info_data = process_with_groq(info_prompt, f"CONTEXT: {info_context}")
+            
+            # Check for error in AI response
+            if "error" not in medicine_info_data:
+                medicine_info = medicine_info_data
         
         # Get an image URL for the medicine
         image_url = get_medicine_image_url(medicine_name, GOOGLE_API_KEY, GOOGLE_CSE_ID)
@@ -745,7 +799,11 @@ def alternative_medicine_price():
         
     except Exception as e:
         print(f"An unexpected error occurred during alternative medicine search: {e}")
-        return jsonify({'error': "An unexpected server error occurred."}), 500
+        error_message = str(e)
+        # Ensure we're not returning HTML in error messages
+        if "<" in error_message and ">" in error_message:
+            error_message = "An internal server error occurred. Please try again later."
+        return jsonify({'error': error_message}), 500
 
 # If this script is run directly, start the server
 if __name__ == '__main__':

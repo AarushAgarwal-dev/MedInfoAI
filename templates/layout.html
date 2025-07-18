@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}MedInfo AI{% endblock %}</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo_no_bg.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
@@ -13,9 +17,150 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            font-family: 'Inter', sans-serif;
         }
         .main-content {
             flex-grow: 1;
+        }
+        
+        /* Modern navbar styling */
+        .navbar {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            height: 70px;
+            padding: 0 5vw;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #fff;
+        }
+        
+        .nav-logo img {
+            height: 50px;
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-logo img:hover {
+            transform: scale(1.05);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            position: relative;
+            padding: 8px 4px;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+        
+        /* Footer styling */
+        footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        footer p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* Mobile menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+        }
+        
+        .hamburger {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--text-color);
+            position: relative;
+            transition: background 0.2s ease;
+            --before-transform: none;
+            --after-transform: none;
+        }
+        
+        .hamburger:before,
+        .hamburger:after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 2px;
+            background: var(--text-color);
+            transition: transform 0.2s ease;
+        }
+        
+        .hamburger:before {
+            top: -6px;
+            transform: var(--before-transform);
+        }
+        
+        .hamburger:after {
+            bottom: -6px;
+            transform: var(--after-transform);
+        }
+        
+        @media (max-width: 992px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                transform: translateY(-100%);
+                opacity: 0;
+                pointer-events: none;
+                transition: transform 0.3s ease, opacity 0.3s ease;
+                z-index: 100;
+            }
+            
+            .nav-links.active {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: all;
+            }
+            
+            .nav-link {
+                display: block;
+                padding: 12px 0;
+                text-align: center;
+                width: 100%;
+            }
         }
     </style>
     {% block head %}{% endblock %}
@@ -24,20 +169,23 @@
     <nav class="navbar">
         <div class="nav-logo">
             <a href="{{ url_for('index') }}">
-                <img src="{{ url_for('static', filename='img/logo_no_bg.png') }}" alt="MedInfoAI Logo" style="height: 60px;">
+                <img src="{{ url_for('static', filename='img/logo_no_bg.png') }}" alt="MedInfoAI Logo">
             </a>
         </div>
-        <ul class="nav-links">
-            <li><a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Home</a></li>
-            <li><a href="{{ url_for('search_page') }}" class="nav-link {% if request.endpoint == 'search_page' %}active{% endif %}">Search</a></li>
-            <li><a href="{{ url_for('kendra_finder_page') }}" class="nav-link {% if request.endpoint == 'kendra_finder_page' %}active{% endif %}">Kendra Finder</a></li>
-            <li><a href="{{ url_for('ai_assistant_page') }}" class="nav-link {% if request.endpoint == 'ai_assistant_page' %}active{% endif %}">AI Assistant</a></li>
-            <li><a href="{{ url_for('blog_page') }}" class="nav-link {% if request.endpoint == 'blog_page' %}active{% endif %}">Blog</a></li>
-            <li><a href="{{ url_for('price_comparison_page') }}" class="nav-link {% if request.endpoint == 'price_comparison_page' %}active{% endif %}">Price Comparison</a></li>
-            <li><a href="{{ url_for('daily_essentials_page') }}" class="nav-link {% if request.endpoint == 'daily_essentials_page' %}active{% endif %}">Daily Essentials</a></li>
-            <li><a href="{{ url_for('saved_items_page') }}" class="nav-link {% if request.endpoint == 'saved_items_page' %}active{% endif %}">Saved Items</a></li>
-            <li><a href="{{ url_for('about_page') }}" class="nav-link {% if request.endpoint == 'about_page' %}active{% endif %}">About</a></li>
-        </ul>
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle navigation menu">
+            <span class="hamburger"></span>
+        </button>
+        <div class="nav-links" id="nav-links">
+            <a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Home</a>
+            <a href="{{ url_for('search_page') }}" class="nav-link {% if request.endpoint == 'search_page' %}active{% endif %}">Search</a>
+            <a href="{{ url_for('kendra_finder_page') }}" class="nav-link {% if request.endpoint == 'kendra_finder_page' %}active{% endif %}">Kendra Finder</a>
+            <a href="{{ url_for('ai_assistant_page') }}" class="nav-link {% if request.endpoint == 'ai_assistant_page' %}active{% endif %}">AI Assistant</a>
+            <a href="{{ url_for('blog_page') }}" class="nav-link {% if request.endpoint == 'blog_page' %}active{% endif %}">Blog</a>
+            <a href="{{ url_for('price_comparison_page') }}" class="nav-link {% if request.endpoint == 'price_comparison_page' %}active{% endif %}">Price Comparison</a>
+            <a href="{{ url_for('daily_essentials_page') }}" class="nav-link {% if request.endpoint == 'daily_essentials_page' %}active{% endif %}">Daily Essentials</a>
+            <a href="{{ url_for('saved_items_page') }}" class="nav-link {% if request.endpoint == 'saved_items_page' %}active{% endif %}">Saved Items</a>
+            <a href="{{ url_for('about_page') }}" class="nav-link {% if request.endpoint == 'about_page' %}active{% endif %}">About</a>
+        </div>
     </nav>
 
     <div {% if not full_width_page %}class="main-content"{% endif %}>
@@ -45,10 +193,30 @@
     </div>
 
     <footer>
-        <p>Disclaimer: This is an AI-powered tool for informational purposes only. Always consult a healthcare professional.</p>
+        <p>© 2025 MedInfo AI | Disclaimer: This is an AI-powered tool for informational purposes only. Always consult a healthcare professional.</p>
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
     <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-toggle').addEventListener('click', function() {
+            document.getElementById('nav-links').classList.toggle('active');
+            
+            // Change hamburger to X
+            const hamburger = this.querySelector('.hamburger');
+            hamburger.classList.toggle('active');
+            
+            if (hamburger.classList.contains('active')) {
+                hamburger.style.background = 'transparent';
+                hamburger.style.setProperty('--before-transform', 'rotate(45deg)');
+                hamburger.style.setProperty('--after-transform', 'rotate(-45deg)');
+            } else {
+                hamburger.style.background = 'var(--text-color)';
+                hamburger.style.setProperty('--before-transform', 'none');
+                hamburger.style.setProperty('--after-transform', 'none');
+            }
+        });
+    </script>
 </body>
 </html> 
